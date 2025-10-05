@@ -9,7 +9,15 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@/types": ["types/index"],
+      "@/utils/*": ["utils/*"],
+      "@/models/*": ["models/*"],
+      "@/controllers/*": ["controllers/*"],
+      "@/services/*": ["services/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
