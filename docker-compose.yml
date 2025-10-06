@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb-agentlogic
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_DATABASE: agentlogic
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - agentlogic-network
+
+  mongodb-test:
+    image: mongo:7.0
+    container_name: mongodb-agentlogic-test
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_DATABASE: agentlogic-test
+    volumes:
+      - mongodb-test-data:/data/db
+    networks:
+      - agentlogic-network
+
+volumes:
+  mongodb-data:
+  mongodb-test-data:
+
+networks:
+  agentlogic-network:
+    driver: bridge
