@@ -27,7 +27,7 @@ export const helmetConfig = helmet({
  * Sanitización manual de MongoDB
  * Solo sanitiza el body (query y params se manejan diferente)
  */
-export const mongoSanitize = (req: Request, res: Response, next: NextFunction): void => {
+export const mongoSanitize = (req: Request, _res: Response, next: NextFunction): void => {
   const sanitizeObject = (obj: any): any => {
     if (obj && typeof obj === 'object') {
       Object.keys(obj).forEach((key) => {

@@ -21,6 +21,7 @@ interface EnvConfig {
 const requiredEnvVars = [
   'MONGODB_URI',
   'JWT_SECRET',
+  'GEMINI_API_KEY'
 ] as const;
 
 /**

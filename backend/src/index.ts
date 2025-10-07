@@ -8,8 +8,9 @@ import authRoutes from './routes/auth';
 import { httpLogger, errorLogger, logServerStart, logDatabaseConnection } from './middleware/logger.middleware';
 import logger from './config/logger.config';
 import { generalLimiter } from './middleware/rateLimiter';
-import { applySecurity } from './middleware/security'; // ✅ AÑADIR
-import { validateEnv } from './config/env.config'; // ✅ AÑADIR
+import { applySecurity } from './middleware/security'; 
+import { validateEnv } from './config/env.config';
+import aiRoutes from './routes/ai'; 
 
 // Cargar variables de entorno
 dotenv.config();
@@ -60,7 +61,8 @@ function createApp(): Express {
   // Rutas principales
   app.use('/api/exercises', exerciseRoutes);
   app.use('/api/auth', authRoutes);
-
+  app.use('/api/ai', aiRoutes);
+  
   // Manejo de errores
   app.use(notFoundHandler);
   app.use(errorLogger);
