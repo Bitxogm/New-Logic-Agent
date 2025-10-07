@@ -1,6 +1,5 @@
 /**
  * Punto de entrada para todos los tipos
- * Permite importar desde un solo lugar
  */
 
 // Tipos de ejercicios
@@ -22,8 +21,12 @@ export type {
   PaginatedResponse
 } from './api.types';
 
-/**
- * Ahora puedes importar así:
- * 
- * import { IExercise, ApiResponse, DifficultyLevel } from '@/types';
- */
+// Tipos de usuarios
+export type {
+  UserRole,
+  IUser,
+  RegisterDTO,
+  LoginDTO,
+  AuthResponse,
+  JWTPayload
+} from './user.types';

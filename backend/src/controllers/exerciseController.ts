@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Exercise } from '../models/Exercise';
 import { ExerciseValidator } from '../utils/exercise.validator';
 import { AppError } from '../middleware/errorHandler';
-import type { CreateExerciseDTO, UpdateExerciseDTO } from '../types';
+import type { CreateExerciseDTO, ProgrammingLanguage, UpdateExerciseDTO } from '../types';
 
 /**
  * Controlador para gestionar ejercicios de programación
@@ -156,7 +156,7 @@ export class ExerciseController {
       const sanitizedData: CreateExerciseDTO = {
         title: titleValidation.sanitized!,
         description: descValidation.sanitized!,
-        language: languageValidation.sanitized!,
+        language: languageValidation.sanitized! as ProgrammingLanguage,
         difficulty: difficultyValidation.sanitized! as any,
         tags: exerciseData.tags,
         testCases: exerciseData.testCases,
@@ -230,7 +230,7 @@ export class ExerciseController {
         if (!validation.isValid) {
           throw new AppError(validation.error!, 400);
         }
-        updates.language = validation.sanitized! as any;
+        updates.language = validation.sanitized! as ProgrammingLanguage ;
       }
 
       // Actualizar ejercicio

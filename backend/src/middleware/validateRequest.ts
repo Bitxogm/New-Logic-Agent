@@ -4,7 +4,7 @@ import { AppError } from './errorHandler';
 /**
  * Valida que el body de la petición no esté vacío
  */
-export function validateBody(req: Request, res: Response, next: NextFunction): void {
+export function validateBody(req: Request, _res: Response, next: NextFunction): void {
   if (!req.body || Object.keys(req.body).length === 0) {
     throw new AppError('El cuerpo de la petición no puede estar vacío', 400);
   }
@@ -17,7 +17,7 @@ export function validateBody(req: Request, res: Response, next: NextFunction): v
  * @param paramName - Nombre del parámetro a validar (default: 'id')
  */
 export function validateMongoId(paramName: string = 'id') {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: Request, _res: Response, next: NextFunction): void => {
     const id = req.params[paramName];
     
     // Regex para validar ObjectId de MongoDB (24 caracteres hexadecimales)

@@ -24,7 +24,7 @@ function createApp(): Express {
   app.use(express.urlencoded({ extended: true }));
 
   // Ruta de health check
-  app.get('/health', (req, res) => {
+  app.get('/health', (_req, res) => {
     res.json({
       success: true,
       message: 'API funcionando correctamente',
