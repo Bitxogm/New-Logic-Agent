@@ -7,19 +7,23 @@
 import rateLimit from 'express-rate-limit';
 import logger from '../config/logger.config';
 
+// ✅ AÑADIR: Deshabilitar rate limiting en tests
+const isTestEnvironment = process.env.NODE_ENV === 'test';
+
 /**
  * Rate limiter general para toda la API
  * 100 peticiones por 15 minutos por IP
  */
 export const generalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // 100 peticiones por ventana
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  skip: () => isTestEnvironment, // ✅ AÑADIR: Skip en tests
   message: {
     success: false,
     error: 'Demasiadas peticiones desde esta IP, por favor intenta de nuevo más tarde',
   },
-  standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
-  legacyHeaders: false, // Disable `X-RateLimit-*` headers
+  standardHeaders: true,
+  legacyHeaders: false,
   handler: (req, res) => {
     logger.warn('⚠️ Rate limit alcanzado - General', {
       ip: req.ip,
@@ -39,13 +43,14 @@ export const generalLimiter = rateLimit({
  * 5 intentos por 15 minutos por IP
  */
 export const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 5, // 5 intentos
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  skip: () => isTestEnvironment, // ✅ AÑADIR: Skip en tests
+  skipSuccessfulRequests: true,
   message: {
     success: false,
     error: 'Demasiados intentos de login. Por favor intenta de nuevo en 15 minutos',
   },
-  skipSuccessfulRequests: true, // No contar requests exitosos
   handler: (req, res) => {
     logger.error('🚨 ALERTA: Rate limit alcanzado - Login', {
       ip: req.ip,
@@ -65,8 +70,9 @@ export const loginLimiter = rateLimit({
  * 3 registros por hora por IP
  */
 export const registerLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hora
-  max: 3, // 3 registros
+  windowMs: 60 * 60 * 1000,
+  max: 3,
+  skip: () => isTestEnvironment, // ✅ AÑADIR: Skip en tests
   message: {
     success: false,
     error: 'Demasiados registros desde esta IP. Por favor intenta de nuevo más tarde',
@@ -89,8 +95,9 @@ export const registerLimiter = rateLimit({
  * 20 peticiones por 15 minutos
  */
 export const createResourceLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 20, // 20 creaciones
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  skip: () => isTestEnvironment, // ✅ AÑADIR: Skip en tests
   message: {
     success: false,
     error: 'Demasiadas creaciones. Por favor intenta de nuevo más tarde',

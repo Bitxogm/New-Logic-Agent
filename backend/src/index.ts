@@ -5,13 +5,22 @@ import { connectDatabase } from './config/database';
 import exerciseRoutes from './routes/exercises';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import authRoutes from './routes/auth';
-
-// ✅ AÑADIR ESTAS 2 LÍNEAS
 import { httpLogger, errorLogger, logServerStart, logDatabaseConnection } from './middleware/logger.middleware';
 import logger from './config/logger.config';
+import { generalLimiter } from './middleware/rateLimiter';
+import { applySecurity } from './middleware/security'; // ✅ AÑADIR
+import { validateEnv } from './config/env.config'; // ✅ AÑADIR
 
 // Cargar variables de entorno
 dotenv.config();
+
+// ✅ AÑADIR: Validar variables de entorno al inicio
+try {
+  validateEnv();
+} catch (error) {
+  console.error('Error en variables de entorno:', error);
+  process.exit(1);
+}
 
 /**
  * Crea y configura la aplicación Express
@@ -19,21 +28,28 @@ dotenv.config();
 function createApp(): Express {
   const app = express();
   
-  // ✅ AÑADIR ESTA LÍNEA (primero de todo, antes de cors)
-  app.use(httpLogger); // Loguear todas las peticiones HTTP
+  // ✅ AÑADIR: Seguridad (primero de todo)
+  applySecurity(app);
   
-  // Middleware básico
+  // Logger HTTP
+  app.use(httpLogger);
+  
+  // Rate limiting general
+  app.use(generalLimiter);
+  
+  // CORS
   app.use(cors({
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
     credentials: true
   }));
   
+  // Parsing
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
   // Ruta de health check
   app.get('/health', (_req, res) => {
-    logger.info('Health check solicitado'); // ✅ AÑADIR esto
+    logger.info('Health check solicitado');
     res.json({
       success: true,
       message: 'API funcionando correctamente',
@@ -47,7 +63,7 @@ function createApp(): Express {
 
   // Manejo de errores
   app.use(notFoundHandler);
-  app.use(errorLogger);  // ✅ AÑADIR esto (antes de errorHandler)
+  app.use(errorLogger);
   app.use(errorHandler);
 
   return app;
@@ -58,22 +74,17 @@ function createApp(): Express {
  */
 async function startServer(): Promise<void> {
   try {
-    // Conectar a la base de datos
     await connectDatabase();
-    logDatabaseConnection(true); // ✅ AÑADIR esto
+    logDatabaseConnection(true);
 
-    // Crear app
     const app = createApp();
-
-    // Puerto
     const PORT = process.env.PORT || 5000;
 
-    // Iniciar servidor
     app.listen(PORT, () => {
-      logServerStart(PORT); // ✅ CAMBIAR los console.log por esto
+      logServerStart(PORT);
     });
   } catch (error) {
-    logDatabaseConnection(false, error as Error); // ✅ AÑADIR esto
+    logDatabaseConnection(false, error as Error);
     logger.error('❌ Error iniciando servidor:', error);
     process.exit(1);
   }
@@ -81,12 +92,12 @@ async function startServer(): Promise<void> {
 
 // Manejo de señales de terminación
 process.on('SIGTERM', () => {
-  logger.warn('⚠️ SIGTERM recibido, cerrando servidor...'); // ✅ CAMBIAR console.log
+  logger.warn('⚠️ SIGTERM recibido, cerrando servidor...');
   process.exit(0);
 });
 
 process.on('SIGINT', () => {
-  logger.warn('⚠️ SIGINT recibido, cerrando servidor...'); // ✅ CAMBIAR console.log
+  logger.warn('⚠️ SIGINT recibido, cerrando servidor...');
   process.exit(0);
 });
 
@@ -95,5 +106,4 @@ if (process.env.NODE_ENV !== 'test') {
   startServer();
 }
 
-// Exportar app para tests
 export { createApp };
