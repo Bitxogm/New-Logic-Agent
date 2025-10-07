@@ -4,6 +4,11 @@ import dotenv from 'dotenv';
 import { connectDatabase } from './config/database';
 import exerciseRoutes from './routes/exercises';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
+import authRoutes from './routes/auth';
+
+// ✅ AÑADIR ESTAS 2 LÍNEAS
+import { httpLogger, errorLogger, logServerStart, logDatabaseConnection } from './middleware/logger.middleware';
+import logger from './config/logger.config';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -13,7 +18,10 @@ dotenv.config();
  */
 function createApp(): Express {
   const app = express();
-
+  
+  // ✅ AÑADIR ESTA LÍNEA (primero de todo, antes de cors)
+  app.use(httpLogger); // Loguear todas las peticiones HTTP
+  
   // Middleware básico
   app.use(cors({
     origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
@@ -25,6 +33,7 @@ function createApp(): Express {
 
   // Ruta de health check
   app.get('/health', (_req, res) => {
+    logger.info('Health check solicitado'); // ✅ AÑADIR esto
     res.json({
       success: true,
       message: 'API funcionando correctamente',
@@ -34,9 +43,11 @@ function createApp(): Express {
 
   // Rutas principales
   app.use('/api/exercises', exerciseRoutes);
+  app.use('/api/auth', authRoutes);
 
   // Manejo de errores
   app.use(notFoundHandler);
+  app.use(errorLogger);  // ✅ AÑADIR esto (antes de errorHandler)
   app.use(errorHandler);
 
   return app;
@@ -49,6 +60,7 @@ async function startServer(): Promise<void> {
   try {
     // Conectar a la base de datos
     await connectDatabase();
+    logDatabaseConnection(true); // ✅ AÑADIR esto
 
     // Crear app
     const app = createApp();
@@ -58,24 +70,23 @@ async function startServer(): Promise<void> {
 
     // Iniciar servidor
     app.listen(PORT, () => {
-      console.log(`✅ Servidor corriendo en puerto ${PORT}`);
-      console.log(`🌍 Entorno: ${process.env.NODE_ENV || 'development'}`);
-      console.log(`📝 API: http://localhost:${PORT}/api`);
+      logServerStart(PORT); // ✅ CAMBIAR los console.log por esto
     });
   } catch (error) {
-    console.error('❌ Error iniciando servidor:', error);
+    logDatabaseConnection(false, error as Error); // ✅ AÑADIR esto
+    logger.error('❌ Error iniciando servidor:', error);
     process.exit(1);
   }
 }
 
 // Manejo de señales de terminación
 process.on('SIGTERM', () => {
-  console.log('SIGTERM recibido, cerrando servidor...');
+  logger.warn('⚠️ SIGTERM recibido, cerrando servidor...'); // ✅ CAMBIAR console.log
   process.exit(0);
 });
 
 process.on('SIGINT', () => {
-  console.log('SIGINT recibido, cerrando servidor...');
+  logger.warn('⚠️ SIGINT recibido, cerrando servidor...'); // ✅ CAMBIAR console.log
   process.exit(0);
 });
 
