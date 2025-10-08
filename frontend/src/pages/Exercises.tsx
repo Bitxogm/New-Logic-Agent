@@ -1,21 +1,31 @@
-// ============================================
-// src/pages/Exercises.tsx
-// ============================================
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { useIsAuthenticated } from '@/store/authStore';
+import { ExerciseFilters as FilterType } from '@/types';
+import ExerciseList from '@/components/exercises/ExerciseList';
+import ExerciseFilters from '@/components/exercises/ExerciseFilters';
 
+/**
+ * Página de ejercicios
+ * Lista todos los ejercicios con filtros
+ */
 export default function Exercises() {
   const isAuthenticated = useIsAuthenticated();
+  
+  const [filters, setFilters] = useState<FilterType>({
+    page: 1,
+    limit: 12,
+  });
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">Ejercicios</h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
             Explora y practica con ejercicios de programación
           </p>
         </div>
@@ -29,17 +39,18 @@ export default function Exercises() {
         )}
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Lista de Ejercicios</CardTitle>
-          <CardDescription>Filtros y búsqueda próximamente</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-center text-gray-600 py-8">
-            Lista de ejercicios en construcción...
-          </p>
-        </CardContent>
-      </Card>
+      {/* Filtros y Lista */}
+      <div className="grid gap-6 lg:grid-cols-4">
+        {/* Sidebar de filtros */}
+        <div className="lg:col-span-1">
+          <ExerciseFilters filters={filters} onFilterChange={setFilters} />
+        </div>
+
+        {/* Lista de ejercicios */}
+        <div className="lg:col-span-3">
+          <ExerciseList filters={filters} />
+        </div>
+      </div>
     </div>
   );
 }
