@@ -28,3 +28,5 @@ export function validateMongoId(paramName: string = 'id') {
     next();
   };
 }
+
+export const validateId = validateMongoId();
