@@ -12,6 +12,7 @@ export interface IUser {
   _id: ObjectId;
   /** Nombre de usuario único */
   username: string;
+  name: string;
   /** Email único */
   email: string;
   /** Password hasheado (nunca se devuelve al cliente) */
@@ -38,6 +39,7 @@ export interface RegisterDTO {
   username: string;
   email: string;
   password: string;
+  name: string
 }
 
 /**
@@ -56,6 +58,7 @@ export interface AuthResponse {
   user: {
     _id: string;
     username: string;
+    name: string;
     email: string;
     role: UserRole;
   };

@@ -23,7 +23,7 @@ export class AuthController {
    */
   async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { username, email, password }: RegisterDTO = req.body;
+      const { username, email, password, name }: RegisterDTO = req.body;
 
       // Validar username
       const usernameValidation = UserValidator.validateUsername(username);
@@ -59,7 +59,8 @@ export class AuthController {
       const user = await User.create({
         username: usernameValidation.sanitized,
         email: emailValidation.sanitized,
-        password // Se hasheará automáticamente en el pre-save hook
+        password, 
+        name// Se hasheará automáticamente en el pre-save hook
       });
 
       // Generar token
@@ -75,6 +76,7 @@ export class AuthController {
         user: {
           _id: user.id.toString(),
           username: user.username,
+          name: user.name,
           email: user.email,
           role: user.role
         }
@@ -138,6 +140,7 @@ export class AuthController {
         user: {
           _id: user.id.toString(),
           username: user.username,
+          name: user.name,
           email: user.email,
           role: user.role
         }

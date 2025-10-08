@@ -20,6 +20,13 @@ const userSchema = new Schema<IUserDocument>({
     maxlength: [30, 'El username no puede exceder 30 caracteres'],
     match: [/^[a-zA-Z0-9_-]+$/, 'El username solo puede contener letras, números, guiones y guiones bajos']
   },
+    name: {
+    type: String,
+    required: [true, 'El nombre es obligatorio'],
+    trim: true,
+    minlength: [2, 'El nombre debe tener al menos 2 caracteres'],
+    maxlength: [100, 'El nombre no puede exceder 100 caracteres']
+  },
   email: {
     type: String,
     required: [true, 'El email es obligatorio'],
