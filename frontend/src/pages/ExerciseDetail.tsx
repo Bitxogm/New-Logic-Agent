@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import CodeEditor from '@/components/editor/CodeEditor';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { 
   ArrowLeft, 
@@ -278,23 +279,24 @@ export default function ExerciseDetail() {
         </Card>
       )}
 
-      {/* Editor de código (próximamente) */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Editor de Código</CardTitle>
-          <CardDescription>
-            Escribe tu solución aquí
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64 bg-gray-100 dark:bg-gray-900 rounded-lg flex items-center justify-center text-gray-500">
-            <div className="text-center">
-              <Code2 className="h-12 w-12 mx-auto mb-2 opacity-50" />
-              <p>Monaco Editor se integrará aquí próximamente</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Editor de código */}
+      {isAuthenticated && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Editor de Código</CardTitle>
+            <CardDescription>
+              Escribe tu solución y pruébala
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <CodeEditor
+              defaultLanguage={exercise.language}
+              defaultValue={exercise.solution || `// Escribe tu solución en ${exercise.language}\n`}
+              height="500px"
+            />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
