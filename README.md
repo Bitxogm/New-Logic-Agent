@@ -243,7 +243,14 @@ AgentLogic-TS/
 
 ---
 
-## 🚀 Instalación
+## 🚀 Inicio Rápido
+
+### Instalar todas las dependencias
+```bash
+npm run install:all
+
+Lanzar desarrollo (backend + frontend)
+bashnpm run dev
 
 ### Requisitos Previos
 

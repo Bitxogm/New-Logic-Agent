@@ -1,5 +1,31 @@
 {
-  "dependencies": {
-    "@google/generative-ai": "^0.24.1"
+  "name": "agentlogic-ts",
+  "version": "1.0.0",
+  "description": "Plataforma educativa potenciada por IA para aprender programación",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\" --names \"BACKEND,FRONTEND\" --prefix-colors \"blue,magenta\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && npm run test",
+    "test:frontend": "cd frontend && npm run test",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "clean": "rm -rf node_modules backend/node_modules frontend/node_modules backend/dist frontend/dist"
+  },
+  "keywords": [
+    "ai",
+    "education",
+    "programming",
+    "gemini",
+    "typescript"
+  ],
+  "author": "Bitxogm",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
   }
 }
