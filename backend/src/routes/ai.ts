@@ -21,7 +21,7 @@ const aiLimiter = rateLimit({
       path: req.path,
       userId: (req as any).user?._id,
     });
-    
+
     res.status(429).json({
       success: false,
       error: 'Demasiadas peticiones de IA. Por favor intenta de nuevo más tarde',
@@ -266,6 +266,10 @@ router.post(
   aiLimiter,
   validateBody,
   aiController.explain.bind(aiController)
+);
+router.post(
+  '/analyze-exercise',
+  aiController.analyzeExercise.bind(aiController)
 );
 
 export default router;

@@ -8,6 +8,7 @@ import { Request, Response } from 'express';
 import { geminiService } from '../services/gemini.service';
 import { AppError } from '../middleware/errorHandler';
 import logger from '../config/logger.config';
+import {Exercise} from '../models/Exercise';
 import {
   GenerateSolutionRequest,
   AnalyzeCodeRequest,
@@ -118,6 +119,84 @@ export class AIController {
     res.status(200).json({
       success: true,
       data: result,
+    });
+  }
+  /**
+   * Analizar ejercicio y proporcionar roadmap de aprendizaje
+   * POST /api/ai/analyze-exercise
+   */
+  async analyzeExercise(req: Request, res: Response): Promise<void> {
+    const { exerciseId } = req.body;
+
+    if (!exerciseId) {
+      throw new AppError('exerciseId is required', 400);
+    }
+
+    // Get exercise from database
+    const exercise = await Exercise.findById(exerciseId);
+
+    if (!exercise) {
+      throw new AppError('Exercise not found', 404);
+    }
+
+    logger.info('Analyzing exercise', {
+      exerciseId,
+      title: exercise.title,
+      userId: (req as any).user?._id,
+    });
+
+    // Create prompt for Gemini
+    const prompt = `
+You are an expert programming tutor. Analyze this programming exercise and provide a detailed learning plan.
+
+Exercise Title: ${exercise.title}
+Description: ${exercise.description}
+Language: ${exercise.language}
+Difficulty: ${exercise.difficulty}
+
+Provide a JSON response with the following structure:
+{
+  "summary": "A brief 2-3 sentence summary of what this exercise teaches",
+  "keyConcepts": ["concept1", "concept2", "concept3"],
+  "estimatedTime": 15,
+  "prerequisites": ["prerequisite1", "prerequisite2"],
+  "roadmap": [
+    {
+      "id": "1",
+      "title": "Step title",
+      "description": "What to do in this step",
+      "completed": false
+    }
+  ],
+  "difficulty": "beginner"
+}
+
+Make it encouraging and educational. The roadmap should guide them step-by-step without giving away the solution.
+`;
+
+    // Call Gemini
+    const geminiResponse = await geminiService.generateContent(prompt);
+    
+    // Parse JSON response
+    let analysisData;
+    try {
+      const jsonMatch = geminiResponse.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new AppError('No JSON found in AI response', 500);
+      }
+      analysisData = JSON.parse(jsonMatch[0]);
+    } catch (parseError) {
+      logger.error('Failed to parse Gemini response:', parseError);
+      throw new AppError('Failed to parse AI response', 500);
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        exerciseId: exercise._id,
+        exerciseTitle: exercise.title,
+        analysis: analysisData,
+      },
     });
   }
 }

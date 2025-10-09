@@ -26,7 +26,7 @@ class GeminiService {
     if (this.genAI) return; // Ya inicializado
 
     const apiKey = process.env.GEMINI_API_KEY;
-    
+
     if (!apiKey) {
       logger.error('❌ GEMINI_API_KEY no configurada');
       throw new Error('GEMINI_API_KEY no está configurada en las variables de entorno');
@@ -34,7 +34,7 @@ class GeminiService {
 
     this.genAI = new GoogleGenerativeAI(apiKey);
     this.model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
-    
+
     logger.info('✅ Gemini Service inicializado con gemini-2.0-flash-exp');
   }
 
@@ -144,17 +144,48 @@ class GeminiService {
       throw error;
     }
   }
+  /**
+  * Generar contenido genérico con Gemini
+  * Útil para casos de uso no específicos
+  */
+  async generateContent(prompt: string): Promise<string> {
+    this.initialize();
 
-  // ... resto del código igual (todos los métodos private)
+    const startTime = Date.now();
+
+    logger.info('🤖 Generando contenido con Gemini', {
+      promptLength: prompt.length,
+    });
+
+    try {
+      const result = await this.model.generateContent(prompt);
+      const response = result.response.text();
+
+      const duration = Date.now() - startTime;
+
+      logger.info('✅ Contenido generado exitosamente', {
+        duration: `${duration}ms`,
+        responseLength: response.length,
+      });
+
+      return response;
+    } catch (error) {
+      logger.error('❌ Error generando contenido', {
+        error: (error as Error).message,
+      });
+      throw error;
+    }
+  }
+
   private buildSolutionPrompt(request: GenerateSolutionRequest): string {
     let prompt = `Eres un tutor de programación experto. Genera una solución completa para el siguiente problema:\n\n`;
     prompt += `Problema: ${request.problem}\n`;
     prompt += `Lenguaje: ${request.language}\n`;
-    
+
     if (request.difficulty) {
       prompt += `Dificultad: ${request.difficulty}\n`;
     }
-    
+
     if (request.hints && request.hints.length > 0) {
       prompt += `Pistas: ${request.hints.join(', ')}\n`;
     }
@@ -172,7 +203,7 @@ class GeminiService {
   private buildAnalysisPrompt(request: AnalyzeCodeRequest): string {
     let prompt = `Eres un experto en revisión de código. Analiza el siguiente código:\n\n`;
     prompt += `\`\`\`${request.language}\n${request.code}\n\`\`\`\n\n`;
-    
+
     if (request.focusAreas && request.focusAreas.length > 0) {
       prompt += `Enfócate especialmente en: ${request.focusAreas.join(', ')}\n\n`;
     }
@@ -192,7 +223,7 @@ class GeminiService {
     let prompt = `Eres un tutor de programación. Explica el siguiente tema:\n\n`;
     prompt += `Tema: ${request.topic}\n`;
     prompt += `Nivel: ${request.level || 'intermedio'}\n\n`;
-    
+
     if (request.includeExamples) {
       prompt += `Incluye ejemplos de código prácticos.\n\n`;
     }
