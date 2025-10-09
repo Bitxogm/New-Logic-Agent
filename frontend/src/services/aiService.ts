@@ -119,6 +119,20 @@ class AIService {
       includeExamples: true,
     });
   }
+
+  /**
+  * Analizar ejercicio y obtener roadmap de aprendizaje
+  */
+  async analyzeExercise(exerciseId: string) {
+    const response = await api.post('/ai/analyze-exercise', { exerciseId });
+    return getResponseData(response);
+  }
+
+    async generateFlowchart(exerciseId: string) {
+    const response = await api.post('/ai/generate-flowchart', { exerciseId });
+    return getResponseData(response);
+  }
+
 }
 
 // Exportar instancia única (singleton)

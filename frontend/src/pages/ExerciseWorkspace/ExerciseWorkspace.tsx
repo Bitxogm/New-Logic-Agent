@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { exerciseService } from '@/services/exerciseService';
 import EditorPanel from './components/EditorPanel';
+import ExplanationTab from './components/AIAssistantPanel/ExplanationTab';
+import FlowchartTab from './components/AIAssistantPanel/FlowchartTab';
 
 export default function ExerciseWorkspace() {
   const { id } = useParams<{ id: string }>();
@@ -164,10 +166,15 @@ export default function ExerciseWorkspace() {
 
               {/* Tab Content */}
               <div className="flex-1 p-4 overflow-auto">
-                <div className="text-center text-muted-foreground">
-                  <p className="font-medium mb-2">{activeTab.toUpperCase()}</p>
-                  <p className="text-sm">Content will be implemented in Step 3-6</p>
-                </div>
+                {activeTab === 'explanation' && <ExplanationTab exerciseId={id!} />}
+                {activeTab === 'flowchart' && <FlowchartTab exerciseId={id!} />}
+                
+                {activeTab !== 'explanation' && activeTab !== 'flowchart' && (
+                  <div className="text-center text-muted-foreground">
+                    <p className="font-medium mb-2">{activeTab.toUpperCase()}</p>
+                    <p className="text-sm">Content will be implemented soon</p>
+                  </div>
+                )}
               </div>
             </div>
           </Panel>

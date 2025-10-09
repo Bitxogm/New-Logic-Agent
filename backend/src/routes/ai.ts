@@ -267,9 +267,14 @@ router.post(
   validateBody,
   aiController.explain.bind(aiController)
 );
+
 router.post(
   '/analyze-exercise',
   aiController.analyzeExercise.bind(aiController)
 );
+
+router.post(
+  '/generate-flowchart',
+  aiController.generateFlowchart.bind(aiController));
 
 export default router;

@@ -90,6 +90,103 @@ export class AIController {
       data: result,
     });
   }
+  /**
+   * Generar flowchart Mermaid para un ejercicio
+   * POST /api/ai/generate-flowchart
+   */
+  async generateFlowchart(req: Request, res: Response): Promise<void> {
+    const { exerciseId } = req.body;
+
+    if (!exerciseId) {
+      throw new AppError('exerciseId is required', 400);
+    }
+
+    // Get exercise from database
+    const { Exercise } = await import('../models/Exercise');
+    const exercise = await Exercise.findById(exerciseId);
+
+    if (!exercise) {
+      throw new AppError('Exercise not found', 404);
+    }
+
+    logger.info('Generating flowchart', {
+      exerciseId,
+      title: exercise.title,
+      userId: (req as any).user?._id,
+    });
+
+    // Create prompt for Gemini
+   const prompt = `
+You are an expert at creating educational flowcharts. Create a Mermaid flowchart for this programming exercise.
+
+Exercise Title: ${exercise.title}
+Description: ${exercise.description}
+Language: ${exercise.language}
+
+Create a flowchart that shows the ALGORITHM/LOGIC to solve this problem, NOT the specific code.
+
+CRITICAL RULES for Mermaid syntax:
+1. Use flowchart TD syntax
+2. Node labels CANNOT contain: parentheses (), brackets [], braces {}, semicolons ;, colons :
+3. Use simple, SHORT labels (max 4-5 words)
+4. Decision nodes use {curly braces}
+5. Process nodes use [square brackets]
+6. Keep it educational (5-10 nodes maximum)
+
+GOOD examples:
+- A[Start]
+- B{Check condition}
+- C[Process data]
+- D[Return result]
+
+BAD examples (DO NOT USE):
+- E[Is character a vowel (a,e,i,o,u)?]  ❌ Has parentheses
+- F{Check if x > 0;}  ❌ Has semicolon
+- G[Initialize: count = 0]  ❌ Has colon
+
+Respond with JSON in this exact format:
+{
+  "mermaidCode": "flowchart TD\\n    A[Start] --> B{Check condition}\\n    B -->|Yes| C[Process]\\n    C --> D[End]\\n    B -->|No| D",
+  "description": "This flowchart shows...",
+  "steps": [
+    "Start by initializing variables",
+    "Check if condition is met",
+    "Process the data",
+    "Return the result"
+  ]
+}
+
+Make sure:
+- mermaidCode uses proper escaping for newlines (\\n)
+- Node labels are SHORT and contain NO special characters
+- Use --> for arrows
+- Use |label| for arrow labels
+`;
+    // Call Gemini
+    const geminiResponse = await geminiService.generateContent(prompt);
+    
+    // Parse JSON response
+    let flowchartData;
+    try {
+      const jsonMatch = geminiResponse.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new AppError('No JSON found in AI response', 500);
+      }
+      flowchartData = JSON.parse(jsonMatch[0]);
+    } catch (parseError) {
+      logger.error('Failed to parse Gemini response:', parseError);
+      throw new AppError('Failed to parse AI response', 500);
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        exerciseId: exercise._id,
+        exerciseTitle: exercise.title,
+        flowchart: flowchartData,
+      },
+    });
+  }
 
   /**
    * Explicar concepto
