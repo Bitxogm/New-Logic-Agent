@@ -16,7 +16,8 @@ import {
   Lightbulb,
   CheckCircle2,
   Edit,
-  Trash2
+  Trash2,
+  Zap
 } from 'lucide-react';
 import { useIsAuthenticated } from '@/store/authStore';
 import { formatDistanceToNow } from 'date-fns';
@@ -166,6 +167,17 @@ export default function ExerciseDetail() {
           </div>
         </div>
 
+        {/* 🚀 BOTÓN PRINCIPAL - ACADEMY MODE (UBICACIÓN 1 - MÁS VISIBLE) */}
+        <Button
+          onClick={() => navigate(`/exercises/${id}/workspace`)}
+          size="lg"
+          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all"
+        >
+          <Sparkles className="mr-2 h-5 w-5" />
+          Entrar al Academy Workspace
+          <Zap className="ml-2 h-5 w-5" />
+        </Button>
+
         {/* Tags */}
         {exercise.tags && exercise.tags.length > 0 && (
           <div className="flex flex-wrap gap-2">
@@ -279,13 +291,39 @@ export default function ExerciseDetail() {
         </Card>
       )}
 
-      {/* Editor de código */}
+      {/* 🚀 BOTÓN SECUNDARIO - ACADEMY MODE (UBICACIÓN 2 - ANTES DEL EDITOR) */}
+      {isAuthenticated && (
+        <Card className="border-2 border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-blue-600" />
+              ¿Quieres una experiencia de aprendizaje completa?
+            </CardTitle>
+            <CardDescription>
+              Accede al Academy Workspace con IA tutor, flowcharts interactivos, análisis en tiempo real y mucho más
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={() => navigate(`/exercises/${id}/workspace`)}
+              size="lg"
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+            >
+              <Zap className="mr-2 h-5 w-5" />
+              Abrir Academy Workspace
+              <Sparkles className="ml-2 h-5 w-5" />
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Editor de código (SIMPLE - PREVIEW) */}
       {isAuthenticated && (
         <Card>
           <CardHeader>
-            <CardTitle>Editor de Código</CardTitle>
+            <CardTitle>Vista Previa del Editor</CardTitle>
             <CardDescription>
-              Escribe tu solución y pruébala
+              Para la experiencia completa, usa el Academy Workspace
             </CardDescription>
           </CardHeader>
           <CardContent>

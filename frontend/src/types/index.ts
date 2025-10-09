@@ -53,6 +53,7 @@ export interface Exercise {
   tags: string[];
   testCases: TestCase[];
   solution?: string;
+  starterCode?: string; // 👈 NUEVA PROPIEDAD
   hints?: string[];
   createdBy?: string;
   createdAt: string;
@@ -67,6 +68,7 @@ export interface CreateExerciseData {
   tags?: string[];
   testCases: TestCase[];
   solution?: string;
+  starterCode?: string; // 👈 NUEVA PROPIEDAD
   hints?: string[];
 }
 
@@ -78,6 +80,7 @@ export interface UpdateExerciseData {
   tags?: string[];
   testCases?: TestCase[];
   solution?: string;
+  starterCode?: string; // 👈 NUEVA PROPIEDAD
   hints?: string[];
 }
 

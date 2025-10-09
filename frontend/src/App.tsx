@@ -14,6 +14,7 @@ import Dashboard from './pages/Dashboard';
 import Exercises from './pages/Exercises';
 import ExerciseDetail from './pages/ExerciseDetail';
 import CreateExercise from './pages/CreateExercise';
+import ExerciseWorkspace from '@/pages/ExerciseWorkspace/ExerciseWorkspace';
 
 /**
  * QueryClient para React Query
@@ -86,6 +87,7 @@ function App() {
             {/* Rutas de ejercicios (públicas) */}
             <Route path="/exercises" element={<Exercises />} />
             <Route path="/exercises/:id" element={<ExerciseDetail />} />
+            <Route path="/exercises/:id/workspace" element={<ExerciseWorkspace />} /> {/* 👈 NUEVA RUTA */}
 
             {/* Rutas protegidas (requieren autenticación) */}
             <Route
