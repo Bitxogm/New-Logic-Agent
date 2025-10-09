@@ -4,10 +4,11 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
-import { ArrowLeft, Code2, Sparkles } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { exerciseService } from '@/services/exerciseService';
+import EditorPanel from './components/EditorPanel';
 
 export default function ExerciseWorkspace() {
   const { id } = useParams<{ id: string }>();
@@ -22,6 +23,7 @@ export default function ExerciseWorkspace() {
 
   // State
   const [code, setCode] = useState('');
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [activeTab, setActiveTab] = useState<'explanation' | 'flowchart' | 'chat' | 'tests'>('explanation');
 
   // Initialize code when exercise loads
@@ -34,15 +36,22 @@ export default function ExerciseWorkspace() {
         `// Write your ${exercise.language} solution here\n`;
       
       setCode(initialCode);
+      setHasUnsavedChanges(false);
     }
   }, [exercise]);
+
+  // Handle code changes
+  const handleCodeChange = (newCode: string) => {
+    setCode(newCode);
+    setHasUnsavedChanges(true);
+  };
 
   // Loading state
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center">
-          <Code2 className="h-12 w-12 animate-pulse mx-auto mb-4 text-primary" />
+          <Sparkles className="h-12 w-12 animate-pulse mx-auto mb-4 text-primary" />
           <p className="text-muted-foreground">Loading workspace...</p>
         </div>
       </div>
@@ -109,27 +118,13 @@ export default function ExerciseWorkspace() {
         <PanelGroup direction="horizontal">
           {/* Left Panel: Editor */}
           <Panel defaultSize={60} minSize={30}>
-            <div className="h-full flex flex-col bg-muted/30 border-r">
-              <div className="p-4 border-b bg-card">
-                <h2 className="font-semibold flex items-center gap-2">
-                  <Code2 className="h-4 w-4" />
-                  Code Editor
-                </h2>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Write your solution here
-                </p>
-              </div>
-              
-              <div className="flex-1 p-4">
-                <div className="h-full border rounded-lg bg-background flex items-center justify-center">
-                  <div className="text-center text-muted-foreground">
-                    <Code2 className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                    <p>Monaco Editor will go here (Step 2)</p>
-                    <p className="text-xs mt-2">Current code length: {code.length} chars</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <EditorPanel
+              code={code}
+              language={exercise.language}
+              starterCode={exercise.starterCode || exercise.solution || ''}
+              onChange={handleCodeChange}
+              hasUnsavedChanges={hasUnsavedChanges}
+            />
           </Panel>
 
           {/* Resize Handle */}

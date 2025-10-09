@@ -1,4 +1,6 @@
-import { useState, useRef } from 'react';
+// src/components/editor/CodeEditor.tsx
+
+import { useState, useRef, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -8,8 +10,10 @@ import { toast } from 'sonner';
 interface CodeEditorProps {
   defaultLanguage?: string;
   defaultValue?: string;
+  onChange?: (value: string) => void;  // 👈 AÑADIDO
   onRun?: (code: string, language: string) => void;
   height?: string;
+  showToolbar?: boolean;  // 👈 AÑADIDO
 }
 
 /**
@@ -19,8 +23,10 @@ interface CodeEditorProps {
 export default function CodeEditor({
   defaultLanguage = 'javascript',
   defaultValue = '// Escribe tu código aquí\n',
+  onChange,  // 👈 AÑADIDO
   onRun,
   height = '400px',
+  showToolbar = true,  // 👈 AÑADIDO
 }: CodeEditorProps) {
   const [language, setLanguage] = useState(defaultLanguage);
   const [code, setCode] = useState(defaultValue);
@@ -33,130 +39,104 @@ export default function CodeEditor({
     editor.focus();
   };
 
+  // 👇 AÑADIDO: Cuando el código cambia desde fuera
+  useEffect(() => {
+    setCode(defaultValue);
+  }, [defaultValue]);
+
+  // 👇 MODIFICADO: Cuando el usuario escribe
+  const handleEditorChange = (value: string | undefined) => {
+    const newCode = value || '';
+    setCode(newCode);
+    if (onChange) {
+      onChange(newCode);  // 👈 Notificar al padre
+    }
+  };
+
   // Ejecutar código
   const handleRun = () => {
     if (onRun) {
       onRun(code, language);
     } else {
-      toast.info('Ejecutar código', {
-        description: 'Esta funcionalidad se implementará pronto',
+      toast.info('Ejecutando código...', {
+        description: 'Esta funcionalidad se implementará pronto'
       });
     }
   };
 
   // Copiar código
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(code);
-      setCopied(true);
-      toast.success('Código copiado al portapapeles');
-      setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      toast.error('Error al copiar el código');
-    }
+  const handleCopy = () => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    toast.success('Código copiado al portapapeles');
+    setTimeout(() => setCopied(false), 2000);
   };
 
-  // Limpiar editor
+  // Limpiar código
   const handleClear = () => {
-    if (window.confirm('¿Seguro que quieres limpiar el editor?')) {
+    if (window.confirm('¿Estás seguro de borrar todo el código?')) {
       setCode('');
-      editorRef.current?.focus();
-      toast.success('Editor limpiado');
+      if (onChange) {
+        onChange('');
+      }
+      toast.info('Código borrado');
     }
   };
 
-  // Cambiar lenguaje
-  const handleLanguageChange = (newLanguage: string) => {
-    setLanguage(newLanguage);
-    toast.info(`Lenguaje cambiado a ${getLanguageLabel(newLanguage)}`);
-  };
-
-  // Helper: Obtener label del lenguaje
-  const getLanguageLabel = (lang: string) => {
-    const labels: Record<string, string> = {
-      javascript: 'JavaScript',
-      typescript: 'TypeScript',
-      python: 'Python',
-      java: 'Java',
-      cpp: 'C++',
-      csharp: 'C#',
-      go: 'Go',
-      rust: 'Rust',
-      php: 'PHP',
-      ruby: 'Ruby',
-    };
-    return labels[lang] || lang;
-  };
+  const LANGUAGES = [
+    { value: 'javascript', label: 'JavaScript' },
+    { value: 'typescript', label: 'TypeScript' },
+    { value: 'python', label: 'Python' },
+    { value: 'java', label: 'Java' },
+    { value: 'cpp', label: 'C++' },
+    { value: 'csharp', label: 'C#' },
+    { value: 'go', label: 'Go' },
+    { value: 'rust', label: 'Rust' },
+    { value: 'php', label: 'PHP' },
+    { value: 'ruby', label: 'Ruby' },
+  ];
 
   return (
-    <div className="border rounded-lg overflow-hidden">
-      {/* Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-2 p-3 bg-gray-100 dark:bg-gray-900 border-b">
-        {/* Selector de lenguaje */}
-        <Select value={language} onValueChange={handleLanguageChange}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Seleccionar lenguaje" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="javascript">JavaScript</SelectItem>
-            <SelectItem value="typescript">TypeScript</SelectItem>
-            <SelectItem value="python">Python</SelectItem>
-            <SelectItem value="java">Java</SelectItem>
-            <SelectItem value="cpp">C++</SelectItem>
-            <SelectItem value="csharp">C#</SelectItem>
-            <SelectItem value="go">Go</SelectItem>
-            <SelectItem value="rust">Rust</SelectItem>
-            <SelectItem value="php">PHP</SelectItem>
-            <SelectItem value="ruby">Ruby</SelectItem>
-          </SelectContent>
-        </Select>
+    <div className="border rounded-lg overflow-hidden bg-background">
+      {/* Toolbar - Solo se muestra si showToolbar es true */}
+      {showToolbar && (
+        <div className="flex items-center justify-between p-3 border-b bg-muted">
+          <Select value={language} onValueChange={setLanguage}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {LANGUAGES.map((lang) => (
+                <SelectItem key={lang.value} value={lang.value}>
+                  {lang.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-        {/* Acciones */}
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleCopy}
-          >
-            {copied ? (
-              <>
-                <Check className="mr-2 h-4 w-4" />
-                Copiado
-              </>
-            ) : (
-              <>
-                <Copy className="mr-2 h-4 w-4" />
-                Copiar
-              </>
+          <div className="flex gap-2">
+            <Button variant="ghost" size="sm" onClick={handleCopy}>
+              {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={handleClear}>
+              <Trash2 className="h-4 w-4" />
+            </Button>
+            {onRun && (
+              <Button variant="default" size="sm" onClick={handleRun}>
+                <Play className="h-4 w-4 mr-2" />
+                Ejecutar
+              </Button>
             )}
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleClear}
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Limpiar
-          </Button>
-
-          <Button
-            variant="default"
-            size="sm"
-            onClick={handleRun}
-          >
-            <Play className="mr-2 h-4 w-4" />
-            Ejecutar
-          </Button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Editor */}
       <Editor
         height={height}
         language={language}
         value={code}
-        onChange={(value) => setCode(value || '')}
+        onChange={handleEditorChange}  // 👈 MODIFICADO
         onMount={handleEditorDidMount}
         theme="vs-dark"
         options={{
@@ -168,7 +148,6 @@ export default function CodeEditor({
           automaticLayout: true,
           tabSize: 2,
           wordWrap: 'on',
-          padding: { top: 16, bottom: 16 },
         }}
       />
     </div>
