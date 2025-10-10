@@ -128,8 +128,26 @@ class AIService {
     return getResponseData(response);
   }
 
-    async generateFlowchart(exerciseId: string) {
+  async generateFlowchart(exerciseId: string) {
     const response = await api.post('/ai/generate-flowchart', { exerciseId });
+    return getResponseData(response);
+  }
+
+  /**
+   * Enviar mensaje al chat contextual
+   */
+  async sendChatMessage(
+    exerciseId: string,
+    message: string,
+    currentCode: string,
+    conversationHistory: Array<{ role: string; content: string }>
+  ) {
+    const response = await api.post('/ai/chat', {
+      exerciseId,
+      message,
+      currentCode,
+      conversationHistory,
+    });
     return getResponseData(response);
   }
 

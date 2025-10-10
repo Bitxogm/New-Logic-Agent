@@ -189,6 +189,96 @@ Make sure:
   }
 
   /**
+   * Enviar mensaje al chat contextual
+   * POST /api/ai/chat
+   */
+  async sendChatMessage(req: Request, res: Response): Promise<void> {
+    const { exerciseId, message, currentCode, conversationHistory } = req.body;
+
+    if (!exerciseId || !message) {
+      throw new AppError('exerciseId and message are required', 400);
+    }
+
+    // Get exercise from database
+    const { Exercise } = await import('../models/Exercise');
+    const exercise = await Exercise.findById(exerciseId);
+
+    if (!exercise) {
+      throw new AppError('Exercise not found', 404);
+    }
+
+    logger.info('Processing chat message', {
+      exerciseId,
+      messageLength: message.length,
+      hasCode: !!currentCode,
+      userId: (req as any).user?._id,
+    });
+
+    // Build context-aware prompt
+    const context = `
+You are an expert programming tutor helping a student solve this exercise:
+
+EXERCISE: ${exercise.title}
+DESCRIPTION: ${exercise.description}
+LANGUAGE: ${exercise.language}
+DIFFICULTY: ${exercise.difficulty}
+
+${currentCode ? `STUDENT'S CURRENT CODE:\n\`\`\`${exercise.language}\n${currentCode}\n\`\`\`` : 'Student hasn\'t written code yet.'}
+
+CONVERSATION HISTORY:
+${conversationHistory && conversationHistory.length > 0 
+  ? conversationHistory.map((msg: any) => `${msg.role}: ${msg.content}`).join('\n')
+  : 'This is the first message.'}
+
+STUDENT'S QUESTION: ${message}
+
+INSTRUCTIONS:
+1. Be encouraging and educational
+2. Don't give the complete solution
+3. Guide them with hints and questions
+4. Reference their current code if provided
+5. Keep responses concise (2-3 paragraphs max)
+6. If they're stuck, suggest breaking the problem into smaller steps
+7. Celebrate their progress
+
+Respond as a friendly tutor would:
+`;
+
+    // Call Gemini
+    const geminiResponse = await geminiService.generateContent(context);
+
+    // Return response
+    res.status(200).json({
+      success: true,
+      data: {
+        message: geminiResponse,
+        timestamp: new Date().toISOString(),
+        suggestedActions: this.generateSuggestedActions(exercise, currentCode),
+      },
+    });
+  }
+
+  /**
+   * Generate suggested actions/questions for the chat
+   */
+  private generateSuggestedActions(_exercise: any, currentCode?: string): string[] {
+    const actions = [];
+
+    if (!currentCode) {
+      actions.push("How do I start?");
+      actions.push("Explain the problem");
+    } else {
+      actions.push("Is my approach correct?");
+      actions.push("How can I improve this?");
+      actions.push("Can you explain this concept?");
+    }
+
+    actions.push("Show me a hint");
+
+    return actions;
+  }
+
+  /**
    * Explicar concepto
    * POST /api/ai/explain
    */

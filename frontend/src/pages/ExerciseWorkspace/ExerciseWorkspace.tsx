@@ -11,6 +11,7 @@ import { exerciseService } from '@/services/exerciseService';
 import EditorPanel from './components/EditorPanel';
 import ExplanationTab from './components/AIAssistantPanel/ExplanationTab';
 import FlowchartTab from './components/AIAssistantPanel/FlowchartTab';
+import ChatTab from './components/AIAssistantPanel/ChatTab';
 
 export default function ExerciseWorkspace() {
   const { id } = useParams<{ id: string }>();
@@ -32,11 +33,11 @@ export default function ExerciseWorkspace() {
   useEffect(() => {
     if (exercise) {
       // Priority: starterCode > solution > default template
-      const initialCode = 
-        exercise.starterCode || 
-        exercise.solution || 
+      const initialCode =
+        exercise.starterCode ||
+        exercise.solution ||
         `// Write your ${exercise.language} solution here\n`;
-      
+
       setCode(initialCode);
       setHasUnsavedChanges(false);
     }
@@ -97,7 +98,7 @@ export default function ExerciseWorkspace() {
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          
+
           <div className="flex items-center gap-3">
             <Sparkles className="h-5 w-5 text-primary" />
             <div>
@@ -152,11 +153,10 @@ export default function ExerciseWorkspace() {
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab as any)}
-                      className={`px-4 py-2 text-sm font-medium capitalize transition-colors ${
-                        activeTab === tab
+                      className={`px-4 py-2 text-sm font-medium capitalize transition-colors ${activeTab === tab
                           ? 'text-primary border-b-2 border-primary'
                           : 'text-muted-foreground hover:text-foreground'
-                      }`}
+                        }`}
                     >
                       {tab}
                     </button>
@@ -168,7 +168,8 @@ export default function ExerciseWorkspace() {
               <div className="flex-1 p-4 overflow-auto">
                 {activeTab === 'explanation' && <ExplanationTab exerciseId={id!} />}
                 {activeTab === 'flowchart' && <FlowchartTab exerciseId={id!} />}
-                
+                {activeTab === 'chat' && <ChatTab exerciseId={id!} currentCode={code} />}
+
                 {activeTab !== 'explanation' && activeTab !== 'flowchart' && (
                   <div className="text-center text-muted-foreground">
                     <p className="font-medium mb-2">{activeTab.toUpperCase()}</p>
@@ -209,3 +210,4 @@ export default function ExerciseWorkspace() {
     </div>
   );
 }
+

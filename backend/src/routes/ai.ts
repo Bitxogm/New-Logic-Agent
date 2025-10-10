@@ -277,4 +277,7 @@ router.post(
   '/generate-flowchart',
   aiController.generateFlowchart.bind(aiController));
 
+router.post('/chat',
+  aiController.sendChatMessage.bind(aiController));
+
 export default router;
