@@ -11,6 +11,7 @@ import { exerciseService } from '@/services/exerciseService';
 import EditorPanel from './components/EditorPanel';
 import ExplanationTab from './components/AIAssistantPanel/ExplanationTab';
 import FlowchartTab from './components/AIAssistantPanel/FlowchartTab';
+import TestsTab from './components/AIAssistantPanel/TestsTab';
 import ChatTab from './components/AIAssistantPanel/ChatTab';
 
 export default function ExerciseWorkspace() {
@@ -49,6 +50,16 @@ export default function ExerciseWorkspace() {
     setHasUnsavedChanges(true);
   };
 
+  // Handle running tests
+  const handleRunTests = async () => {
+    if (!exercise?.testCases || exercise.testCases.length === 0) {
+      console.warn('No test cases available');
+      return;
+    }
+
+    console.log('Running tests with code:', code);
+    // TestsTab maneja internamente los resultados
+  };
   // Loading state
   if (isLoading) {
     return (
@@ -154,8 +165,8 @@ export default function ExerciseWorkspace() {
                       key={tab}
                       onClick={() => setActiveTab(tab as any)}
                       className={`px-4 py-2 text-sm font-medium capitalize transition-colors ${activeTab === tab
-                          ? 'text-primary border-b-2 border-primary'
-                          : 'text-muted-foreground hover:text-foreground'
+                        ? 'text-primary border-b-2 border-primary'
+                        : 'text-muted-foreground hover:text-foreground'
                         }`}
                     >
                       {tab}
@@ -170,12 +181,16 @@ export default function ExerciseWorkspace() {
                 {activeTab === 'flowchart' && <FlowchartTab exerciseId={id!} />}
                 {activeTab === 'chat' && <ChatTab exerciseId={id!} currentCode={code} />}
 
-                {activeTab !== 'explanation' && activeTab !== 'flowchart' && (
-                  <div className="text-center text-muted-foreground">
-                    <p className="font-medium mb-2">{activeTab.toUpperCase()}</p>
-                    <p className="text-sm">Content will be implemented soon</p>
-                  </div>
+                {activeTab === 'tests' && (
+                  <TestsTab
+                    testCases={exercise.testCases || []}
+                    currentCode={code}
+                    language={exercise.language}
+                    onRunTests={handleRunTests}
+                  />
                 )}
+
+
               </div>
             </div>
           </Panel>

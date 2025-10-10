@@ -30,7 +30,7 @@ export const generalLimiter = rateLimit({
       path: req.path,
       method: req.method,
     });
-    
+
     res.status(429).json({
       success: false,
       error: 'Demasiadas peticiones desde esta IP, por favor intenta de nuevo más tarde',
@@ -57,7 +57,7 @@ export const loginLimiter = rateLimit({
       email: req.body?.email,
       attempts: 5,
     });
-    
+
     res.status(429).json({
       success: false,
       error: 'Demasiados intentos de login. Por favor intenta de nuevo en 15 minutos',
@@ -69,6 +69,27 @@ export const loginLimiter = rateLimit({
  * Rate limiter para registro de usuarios
  * 3 registros por hora por IP
  */
+export const testExecutionLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minuto
+  max: 20,
+  skip: () => isTestEnvironment,
+  message: {
+    success: false,
+    error: 'Demasiadas ejecuciones de tests. Por favor intenta de nuevo más tarde',
+  },
+  handler: (req, res) => {
+    logger.warn('⚠️ Rate limit alcanzado - Test Execution', {
+      ip: req.ip,
+      path: req.path,
+    });
+
+    res.status(429).json({
+      success: false,
+      error: 'Demasiadas ejecuciones de tests. Por favor intenta de nuevo más tarde',
+    });
+  },
+});
+
 export const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 3,
@@ -82,7 +103,7 @@ export const registerLimiter = rateLimit({
       ip: req.ip,
       email: req.body?.email,
     });
-    
+
     res.status(429).json({
       success: false,
       error: 'Demasiados registros desde esta IP. Por favor intenta de nuevo más tarde',
@@ -107,7 +128,7 @@ export const createResourceLimiter = rateLimit({
       ip: req.ip,
       path: req.path,
     });
-    
+
     res.status(429).json({
       success: false,
       error: 'Demasiadas creaciones. Por favor intenta de nuevo más tarde',
