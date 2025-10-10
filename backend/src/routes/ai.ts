@@ -29,6 +29,28 @@ const aiLimiter = rateLimit({
   },
 });
 
+const analysisLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 50, // 50 requests (más permisivo para análisis en tiempo real)
+  skip: () => process.env.NODE_ENV === 'test',
+  message: {
+    success: false,
+    error: 'Demasiadas peticiones de análisis. Por favor espera un momento',
+  },
+  handler: (req, res) => {
+    logger.warn('⚠️ Rate limit alcanzado - Code Analysis', {
+      ip: req.ip,
+      path: req.path,
+      userId: (req as any).user?._id,
+    });
+
+    res.status(429).json({
+      success: false,
+      error: 'Demasiadas peticiones de análisis. Por favor espera un momento',
+    });
+  },
+});
+
 /**
  * @swagger
  * /api/ai/generate-solution:
@@ -279,5 +301,15 @@ router.post(
 
 router.post('/chat',
   aiController.sendChatMessage.bind(aiController));
+
+router.post('/chat',
+  aiController.sendChatMessage.bind(aiController));
+
+// ⬇️ AÑADIR ESTAS LÍNEAS AQUÍ ⬇️
+router.post(
+  '/analyze-progress',
+  analysisLimiter,
+  aiController.analyzeProgress.bind(aiController)
+);
 
 export default router;

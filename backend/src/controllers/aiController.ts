@@ -15,6 +15,7 @@ import {
   ExplainRequest,
 } from '../types/ai.types';
 
+
 export class AIController {
   /**
    * Generar solución de código
@@ -386,7 +387,104 @@ Make it encouraging and educational. The roadmap should guide them step-by-step 
       },
     });
   }
+
+  /**
+   * Analizar progreso del código en tiempo real
+   * POST /api/ai/analyze-progress
+   */
+  async analyzeProgress(req: Request, res: Response): Promise<void> {
+    const { exerciseId, currentCode, language } = req.body;
+
+    // Validation
+    if (!exerciseId || !currentCode || !language) {
+      throw new AppError('Missing required fields: exerciseId, currentCode, language', 400);
+    }
+
+    // Get exercise from database
+    const exercise = await Exercise.findById(exerciseId);
+
+    if (!exercise) {
+      throw new AppError('Exercise not found', 404);
+    }
+
+    logger.info(`Analyzing progress for exercise: ${exercise.title}`);
+
+    // Prepare prompt for Gemini
+    const prompt = `You are a programming tutor analyzing a student's code progress.
+
+**Exercise:**
+Title: ${exercise.title}
+Description: ${exercise.description}
+Language: ${language}
+Difficulty: ${exercise.difficulty}
+
+**Expected Solution:**
+${exercise.solution}
+
+**Student's Current Code:**
+${currentCode}
+
+**Your Task:**
+Analyze the student's code and provide a detailed progress report in the following JSON format:
+
+{
+  "progressPercentage": <number 0-100>,
+  "completedRequirements": [<array of strings describing what is correctly implemented>],
+  "missingRequirements": [<array of strings describing what is still needed>],
+  "suggestions": [<array of 2-3 actionable suggestions to improve the code>],
+  "errors": [<array of syntax or logical errors found>],
+  "isComplete": <boolean indicating if the solution is complete>
 }
+
+**Guidelines:**
+- Be encouraging and constructive
+- Focus on what works first, then what needs improvement
+- Suggestions should be specific and actionable
+- Don't give away the complete solution
+- If code is empty or just started, progressPercentage should be 0-10
+- If code has basic structure, 20-40
+- If code is mostly working, 60-80
+- If code is complete and correct, 90-100
+
+Return ONLY the JSON object, no markdown formatting.`;
+
+    // Call Gemini
+    const geminiResponse = await geminiService.generateContent(prompt);
+
+    // Parse response
+    let analysis;
+    try {
+      const jsonMatch = geminiResponse.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new AppError('No JSON found in AI response', 500);
+      }
+      analysis = JSON.parse(jsonMatch[0]);
+    } catch (parseError) {
+      logger.error('Error parsing Gemini response:', parseError);
+      
+      // Fallback analysis
+      analysis = {
+        progressPercentage: currentCode.trim().length > 50 ? 30 : 10,
+        completedRequirements: ['Code structure started'],
+        missingRequirements: ['Complete implementation needed'],
+        suggestions: ['Continue working on the solution', 'Test your code with the test cases'],
+        errors: [],
+        isComplete: false,
+      };
+    }
+
+    // Ensure progressPercentage is within bounds
+    analysis.progressPercentage = Math.max(0, Math.min(100, analysis.progressPercentage));
+
+    logger.info(`Progress analysis complete: ${analysis.progressPercentage}%`);
+
+    res.status(200).json({
+      success: true,
+      analysis,
+    });
+  }
+}
+
 
 // Exportar instancia
 export const aiController = new AIController();

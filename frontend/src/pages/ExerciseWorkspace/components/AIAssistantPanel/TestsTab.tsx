@@ -1,6 +1,6 @@
 // src/pages/ExerciseWorkspace/components/AIAssistantPanel/TestsTab.tsx
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CheckCircle2, XCircle, Play, AlertCircle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,9 +20,10 @@ interface TestsTabProps {
   currentCode: string;
   language: string;
   onRunTests: () => void;
+  triggerRun?: boolean;
 }
 
-export default function TestsTab({ testCases, currentCode, language, onRunTests }: TestsTabProps) {
+export default function TestsTab({ testCases, currentCode, language, onRunTests, triggerRun }: TestsTabProps) {
   const [results, setResults] = useState<TestResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const { celebrateAllTestsPassed, rewardElement } = useConfetti();
@@ -52,7 +53,7 @@ export default function TestsTab({ testCases, currentCode, language, onRunTests 
     } catch (error: any) {
       console.error('Error running tests:', error);
       toast.error(error.message || 'Failed to run tests');
-      
+
       // Set all tests as failed with error
       setResults(testCases.map(testCase => ({
         passed: false,
@@ -66,6 +67,11 @@ export default function TestsTab({ testCases, currentCode, language, onRunTests 
       setIsRunning(false);
     }
   };
+   useEffect(() => {
+    if (triggerRun) {
+      handleRunTests();
+    }
+  }, [triggerRun]);
 
   // Calculate progress
   const passedCount = results.filter(r => r.passed).length;
@@ -76,7 +82,7 @@ export default function TestsTab({ testCases, currentCode, language, onRunTests 
     <div className="space-y-4">
       {/* 🎊 Confetti Elements - MUST BE RENDERED */}
       {rewardElement}
-      
+
       {/* Header */}
       <Card>
         <CardHeader>
@@ -86,8 +92,8 @@ export default function TestsTab({ testCases, currentCode, language, onRunTests 
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button 
-            onClick={handleRunTests} 
+          <Button
+            onClick={handleRunTests}
             className="w-full"
             disabled={isRunning || !currentCode.trim()}
           >
@@ -168,10 +174,9 @@ export default function TestsTab({ testCases, currentCode, language, onRunTests 
                 {hasRun && (
                   <div>
                     <p className="font-medium mb-1">Your Output:</p>
-                    <pre className={`p-2 rounded text-xs overflow-x-auto ${
-                      result.passed ? 'bg-green-500/10' : 'bg-red-500/10'
-                    }`}>
-                      {result.error 
+                    <pre className={`p-2 rounded text-xs overflow-x-auto ${result.passed ? 'bg-green-500/10' : 'bg-red-500/10'
+                      }`}>
+                      {result.error
                         ? result.error
                         : JSON.stringify(result.actualOutput, null, 2)}
                     </pre>

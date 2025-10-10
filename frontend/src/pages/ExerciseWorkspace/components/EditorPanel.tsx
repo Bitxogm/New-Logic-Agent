@@ -30,9 +30,9 @@ export default function EditorPanel({
   const [outputs, setOutputs] = useState<ConsoleOutput[]>([]);
   const [showConsole, setShowConsole] = useState(false);
 
-  console.log('🔍 EditorPanel mounted');
-  console.log('📝 Code length:', code.length);
-  console.log('🌐 Language:', language);
+  // console.log('🔍 EditorPanel mounted');
+  // console.log('📝 Code length:', code.length);
+  // console.log('🌐 Language:', language);
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(code);

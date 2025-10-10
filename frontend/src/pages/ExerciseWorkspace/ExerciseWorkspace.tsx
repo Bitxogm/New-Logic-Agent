@@ -1,6 +1,6 @@
 // src/pages/ExerciseWorkspace/ExerciseWorkspace.tsx
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
@@ -8,11 +8,14 @@ import { ArrowLeft, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { exerciseService } from '@/services/exerciseService';
+import { useCodeAnalysis } from './hooks/useCodeAnalysis';
+import ProgressIndicator from './components/ProgressIndicator';
 import EditorPanel from './components/EditorPanel';
 import ExplanationTab from './components/AIAssistantPanel/ExplanationTab';
 import FlowchartTab from './components/AIAssistantPanel/FlowchartTab';
 import TestsTab from './components/AIAssistantPanel/TestsTab';
 import ChatTab from './components/AIAssistantPanel/ChatTab';
+import { toast } from 'sonner'
 
 export default function ExerciseWorkspace() {
   const { id } = useParams<{ id: string }>();
@@ -29,11 +32,21 @@ export default function ExerciseWorkspace() {
   const [code, setCode] = useState('');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [activeTab, setActiveTab] = useState<'explanation' | 'flowchart' | 'chat' | 'tests'>('explanation');
+  // const [testResults, setTestResults] = useState<any[]>([]);
+  const [triggerTests, setTriggerTests] = useState(false);
+  // Real-time code analysis
+  const { analysis, isAnalyzing } = useCodeAnalysis({
+    exerciseId: id!,
+    code,
+    language: exercise?.language || 'javascript',
+    enabled: !!exercise && code.trim().length > 0,
+    debounceMs: 5000, // Analyze 5 seconds after user stops typing
+  });
+
 
   // Initialize code when exercise loads
   useEffect(() => {
     if (exercise) {
-      // Priority: starterCode > solution > default template
       const initialCode =
         exercise.starterCode ||
         exercise.solution ||
@@ -44,11 +57,31 @@ export default function ExerciseWorkspace() {
     }
   }, [exercise]);
 
+  // ⬇️ AÑADIR ESTE useEffect AQUÍ ⬇️
+
+  // Load saved snapshot on mount
+  useEffect(() => {
+    if (exercise?._id) {
+      try {
+        const saved = localStorage.getItem(`exercise_${exercise._id}`);
+        if (saved) {
+          const snapshot = JSON.parse(saved);
+          if (window.confirm('Found saved progress. Load it?')) {
+            setCode(snapshot.code);
+            toast.success('Progress restored! 📂');
+          }
+        }
+      } catch (error) {
+        console.error('Error loading snapshot:', error);
+      }
+    }
+  }, [exercise?._id]);
+
   // Handle code changes
-  const handleCodeChange = (newCode: string) => {
+  const handleCodeChange = useCallback((newCode: string) => {
     setCode(newCode);
     setHasUnsavedChanges(true);
-  };
+  }, []);
 
   // Handle running tests
   const handleRunTests = async () => {
@@ -60,6 +93,64 @@ export default function ExerciseWorkspace() {
     console.log('Running tests with code:', code);
     // TestsTab maneja internamente los resultados
   };
+
+  // Handle reset code
+  const handleResetCode = () => {
+    if (!exercise) return; // ← AÑADIR ESTA LÍNEA
+
+    if (!hasUnsavedChanges || window.confirm('Reset code to initial state? All changes will be lost.')) {
+      const initialCode =
+        exercise.starterCode ||
+        exercise.solution ||
+        `// Write your ${exercise.language} solution here\n`;
+
+      setCode(initialCode);
+      setHasUnsavedChanges(false);
+      toast.success('Code reset to initial state');
+    }
+  };
+  // Handle save snapshot
+  const handleSaveSnapshot = () => {
+    if (!exercise?._id) return;
+
+    try {
+      const snapshot = {
+        exerciseId: exercise._id,
+        code,
+        timestamp: new Date().toISOString(),
+        language: exercise.language,
+      };
+
+      localStorage.setItem(`exercise_${exercise._id}`, JSON.stringify(snapshot));
+      setHasUnsavedChanges(false);
+      toast.success('Snapshot saved successfully! 💾');
+    } catch (error) {
+      console.error('Error saving snapshot:', error);
+      toast.error('Failed to save snapshot');
+    }
+  };
+
+  // Handle view solution
+  const handleViewSolution = () => {
+    if (!exercise?.solution) {
+      toast.error('No solution available for this exercise');
+      return;
+    }
+
+    if (window.confirm('View the solution? This will replace your current code.')) {
+      setCode(exercise.solution);
+      setHasUnsavedChanges(false);
+      toast.info('Solution loaded. Study it carefully! 📚');
+    }
+  };
+
+  // Handle run tests from footer
+  const handleRunTestsFromFooter = () => {
+    setActiveTab('tests');
+    setTriggerTests(true); // ← Trigger the tests
+    setTimeout(() => setTriggerTests(false), 100); // Reset trigger
+  };
+
   // Loading state
   if (isLoading) {
     return (
@@ -130,15 +221,26 @@ export default function ExerciseWorkspace() {
       {/* Main Content - Split Panels */}
       <div className="flex-1 overflow-hidden">
         <PanelGroup direction="horizontal">
+
+
           {/* Left Panel: Editor */}
           <Panel defaultSize={60} minSize={30}>
-            <EditorPanel
-              code={code}
-              language={exercise.language}
-              starterCode={exercise.starterCode || exercise.solution || ''}
-              onChange={handleCodeChange}
-              hasUnsavedChanges={hasUnsavedChanges}
-            />
+            <div className="h-full flex flex-col">
+              {/* Editor */}
+              <div className="flex-1 overflow-hidden">
+                <EditorPanel
+                  code={code}
+                  language={exercise.language}
+                  starterCode={exercise.starterCode || exercise.solution || ''}
+                  onChange={handleCodeChange}
+                />
+              </div>
+
+              {/* Progress Indicator - Fixed at bottom */}
+              <div className="border-t bg-card p-3 max-h-[40%] overflow-y-auto">
+                <ProgressIndicator analysis={analysis} isAnalyzing={isAnalyzing} />
+              </div>
+            </div>
           </Panel>
 
           {/* Resize Handle */}
@@ -187,9 +289,9 @@ export default function ExerciseWorkspace() {
                     currentCode={code}
                     language={exercise.language}
                     onRunTests={handleRunTests}
+                    triggerRun={triggerTests}
                   />
                 )}
-
 
               </div>
             </div>
@@ -201,22 +303,36 @@ export default function ExerciseWorkspace() {
       <footer className="border-t bg-card px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex gap-2">
-            <Button variant="default" size="sm">
-              Check Progress
-            </Button>
-            <Button variant="outline" size="sm">
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleRunTestsFromFooter}
+            >
               Run Tests
             </Button>
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleResetCode}
+            >
               Reset Code
             </Button>
           </div>
 
           <div className="flex gap-2">
-            <Button variant="ghost" size="sm">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSaveSnapshot}
+            // disabled={!hasUnsavedChanges}
+            >
               Save Snapshot
             </Button>
-            <Button variant="secondary" size="sm">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleViewSolution}
+            >
               View Solution
             </Button>
           </div>
