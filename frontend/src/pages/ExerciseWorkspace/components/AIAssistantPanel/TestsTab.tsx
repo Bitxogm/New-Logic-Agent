@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { testExecutionService, TestResult } from '@/services/testExecutionService';
+import { useConfetti } from '@/hooks/useConfetti';
 
 interface TestCase {
   input: any[];
@@ -24,6 +25,7 @@ interface TestsTabProps {
 export default function TestsTab({ testCases, currentCode, language, onRunTests }: TestsTabProps) {
   const [results, setResults] = useState<TestResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
+  const { celebrateAllTestsPassed, rewardElement } = useConfetti();
 
   const handleRunTests = async () => {
     setIsRunning(true);
@@ -42,6 +44,8 @@ export default function TestsTab({ testCases, currentCode, language, onRunTests 
       // Show success/failure toast
       if (response.summary.allPassed) {
         toast.success(`All tests passed! 🎉 (${response.summary.passed}/${response.summary.total})`);
+        // 🎊 CELEBRATE! All tests passed
+        celebrateAllTestsPassed();
       } else {
         toast.error(`${response.summary.failed} test(s) failed (${response.summary.passed}/${response.summary.total} passed)`);
       }
@@ -70,6 +74,9 @@ export default function TestsTab({ testCases, currentCode, language, onRunTests 
 
   return (
     <div className="space-y-4">
+      {/* 🎊 Confetti Elements - MUST BE RENDERED */}
+      {rewardElement}
+      
       {/* Header */}
       <Card>
         <CardHeader>
