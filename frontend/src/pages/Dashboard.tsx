@@ -1,58 +1,119 @@
-// ============================================
-// src/pages/Dashboard.tsx
-// ============================================
+// frontend/src/pages/Dashboard.tsx
+
+import { useAuthStore } from '@/store/authStore';
+import { useGamification } from '@/hooks/useGamification';
+import StatsWidget from '@/components/gamification/StatsWidget';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useUser } from '@/store/authStore';
+import { Button } from '@/components/ui/button';
+import { BookOpen, Code, Trophy, TrendingUp } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function Dashboard() {
-  const user = useUser();
+  const { user } = useAuthStore();
+  const { stats, isLoading } = useGamification(user?._id || null);
 
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto p-6 space-y-6">
+      {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-gray-600 mt-2">Bienvenido de nuevo, {user?.name}!</p>
+        <h1 className="text-3xl font-bold">Welcome back, {user?.username}! 👋</h1>
+        <p className="text-muted-foreground mt-1">
+          Continue your learning journey
+        </p>
       </div>
 
+      {/* Stats Widget */}
+      <div className="grid gap-6 md:grid-cols-3">
+        <div className="md:col-span-2">
+          <StatsWidget stats={stats} />
+        </div>
+
+        {/* Quick Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Quick Actions</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Button asChild className="w-full justify-start">
+              <Link to="/exercises">
+                <BookOpen className="mr-2 h-4 w-4" />
+                Browse Exercises
+              </Link>
+            </Button>
+            <Button asChild variant="outline" className="w-full justify-start">
+              <Link to="/exercises?difficulty=easy">
+                <Code className="mr-2 h-4 w-4" />
+                Start Easy
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Progress Cards */}
       <div className="grid gap-6 md:grid-cols-3">
         <Card>
-          <CardHeader>
-            <CardTitle>Ejercicios Completados</CardTitle>
-            <CardDescription>Total de ejercicios resueltos</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total XP</CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-bold">0</p>
+            <div className="text-2xl font-bold">
+              {isLoading ? '...' : stats?.totalXP.toLocaleString() || '0'}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Level {stats?.level || 1}
+            </p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Soluciones Generadas</CardTitle>
-            <CardDescription>Con ayuda de IA</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Exercises Solved</CardTitle>
+            <Code className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-bold">0</p>
+            <div className="text-2xl font-bold">
+              {isLoading ? '...' : stats?.completedExercises || '0'}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Keep going!
+            </p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Análisis de Código</CardTitle>
-            <CardDescription>Revisiones con IA</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Achievements</CardTitle>
+            <Trophy className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <p className="text-4xl font-bold">0</p>
+            <div className="text-2xl font-bold">
+              {isLoading ? '...' : stats?.achievements.length || '0'}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Badges unlocked
+            </p>
           </CardContent>
         </Card>
       </div>
 
+      {/* Recent Activity */}
       <Card>
         <CardHeader>
-          <CardTitle>Actividad Reciente</CardTitle>
-          <CardDescription>Tus últimas acciones</CardDescription>
+          <CardTitle>Your Learning Path</CardTitle>
+          <CardDescription>
+            Start solving exercises to track your progress here
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-600">No hay actividad reciente</p>
+          <div className="text-center py-8 text-muted-foreground">
+            <BookOpen className="h-12 w-12 mx-auto mb-3 opacity-50" />
+            <p>No recent activity yet</p>
+            <Button asChild className="mt-4">
+              <Link to="/exercises">Start Your First Exercise</Link>
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

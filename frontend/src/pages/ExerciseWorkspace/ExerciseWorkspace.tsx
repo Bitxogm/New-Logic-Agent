@@ -9,13 +9,16 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { exerciseService } from '@/services/exerciseService';
 import { useCodeAnalysis } from './hooks/useCodeAnalysis';
+import { useAuthStore } from '@/store/authStore';
+import { useGamification } from '@/hooks/useGamification';
+import StatsWidget from '@/components/gamification/StatsWidget';
 import ProgressIndicator from './components/ProgressIndicator';
 import EditorPanel from './components/EditorPanel';
 import ExplanationTab from './components/AIAssistantPanel/ExplanationTab';
 import FlowchartTab from './components/AIAssistantPanel/FlowchartTab';
 import TestsTab from './components/AIAssistantPanel/TestsTab';
 import ChatTab from './components/AIAssistantPanel/ChatTab';
-import { toast } from 'sonner'
+import { toast } from 'sonner';
 
 export default function ExerciseWorkspace() {
   const { id } = useParams<{ id: string }>();
@@ -32,17 +35,21 @@ export default function ExerciseWorkspace() {
   const [code, setCode] = useState('');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [activeTab, setActiveTab] = useState<'explanation' | 'flowchart' | 'chat' | 'tests'>('explanation');
-  // const [testResults, setTestResults] = useState<any[]>([]);
   const [triggerTests, setTriggerTests] = useState(false);
+  const [startTime, setStartTime] = useState<number>(Date.now());
+
   // Real-time code analysis
   const { analysis, isAnalyzing } = useCodeAnalysis({
     exerciseId: id!,
     code,
     language: exercise?.language || 'javascript',
     enabled: !!exercise && code.trim().length > 0,
-    debounceMs: 5000, // Analyze 5 seconds after user stops typing
+    debounceMs: 5000,
   });
 
+  // Gamification
+  const { user } = useAuthStore();
+  const { completeExercise, stats } = useGamification(user?._id || null);
 
   // Initialize code when exercise loads
   useEffect(() => {
@@ -54,10 +61,9 @@ export default function ExerciseWorkspace() {
 
       setCode(initialCode);
       setHasUnsavedChanges(false);
+      setStartTime(Date.now());
     }
   }, [exercise]);
-
-  // ⬇️ AÑADIR ESTE useEffect AQUÍ ⬇️
 
   // Load saved snapshot on mount
   useEffect(() => {
@@ -89,14 +95,26 @@ export default function ExerciseWorkspace() {
       console.warn('No test cases available');
       return;
     }
-
     console.log('Running tests with code:', code);
-    // TestsTab maneja internamente los resultados
   };
+
+  // Handle all tests passed - Gamification trigger
+  const handleAllTestsPassed = useCallback(() => {
+    if (!exercise || !user) return;
+
+    const timeSpent = Math.floor((Date.now() - startTime) / 1000 / 60); // minutes
+
+    completeExercise({
+      exerciseId: exercise._id,
+      difficulty: exercise.difficulty,
+      timeSpent,
+      perfectScore: true,
+    });
+  }, [exercise, user, startTime, completeExercise]);
 
   // Handle reset code
   const handleResetCode = () => {
-    if (!exercise) return; // ← AÑADIR ESTA LÍNEA
+    if (!exercise) return;
 
     if (!hasUnsavedChanges || window.confirm('Reset code to initial state? All changes will be lost.')) {
       const initialCode =
@@ -109,6 +127,7 @@ export default function ExerciseWorkspace() {
       toast.success('Code reset to initial state');
     }
   };
+
   // Handle save snapshot
   const handleSaveSnapshot = () => {
     if (!exercise?._id) return;
@@ -147,8 +166,8 @@ export default function ExerciseWorkspace() {
   // Handle run tests from footer
   const handleRunTestsFromFooter = () => {
     setActiveTab('tests');
-    setTriggerTests(true); // ← Trigger the tests
-    setTimeout(() => setTriggerTests(false), 100); // Reset trigger
+    setTriggerTests(true);
+    setTimeout(() => setTriggerTests(false), 100);
   };
 
   // Loading state
@@ -190,39 +209,42 @@ export default function ExerciseWorkspace() {
   return (
     <div className="h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="border-b bg-card px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(`/exercises/${id}`)}
-            title="Exit Academy Mode"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
+   <header className="border-b bg-card px-4 py-3 flex items-center justify-between">
+  <div className="flex items-center gap-3">
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => navigate(`/exercises/${id}`)}
+      title="Exit Academy Mode"
+    >
+      <ArrowLeft className="h-5 w-5" />
+    </Button>
 
-          <div className="flex items-center gap-3">
-            <Sparkles className="h-5 w-5 text-primary" />
-            <div>
-              <h1 className="font-semibold text-lg leading-none">{exercise.title}</h1>
-              <p className="text-sm text-muted-foreground mt-1">Academy Workspace</p>
-            </div>
-          </div>
-        </div>
+    <div className="flex items-center gap-3">
+      <Sparkles className="h-5 w-5 text-primary" />
+      <div>
+        <h1 className="font-semibold text-lg leading-none">{exercise.title}</h1>
+        <p className="text-sm text-muted-foreground mt-1">Academy Workspace</p>
+      </div>
+    </div>
+  </div>
 
-        <div className="flex items-center gap-2">
-          <Badge className={getDifficultyColor(exercise.difficulty)}>
-            {exercise.difficulty}
-          </Badge>
-          <Badge variant="outline">{exercise.language}</Badge>
-        </div>
-      </header>
-
+  <div className="flex items-center gap-3">
+    {/* Stats Widget Compact */}
+    {user && stats && <StatsWidget stats={stats} compact />}
+    
+    {/* Exercise Info */}
+    <div className="flex items-center gap-2">
+      <Badge className={getDifficultyColor(exercise.difficulty)}>
+        {exercise.difficulty}
+      </Badge>
+      <Badge variant="outline">{exercise.language}</Badge>
+    </div>
+  </div>
+</header>
       {/* Main Content - Split Panels */}
       <div className="flex-1 overflow-hidden">
         <PanelGroup direction="horizontal">
-
-
           {/* Left Panel: Editor */}
           <Panel defaultSize={60} minSize={30}>
             <div className="h-full flex flex-col">
@@ -266,10 +288,11 @@ export default function ExerciseWorkspace() {
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab as any)}
-                      className={`px-4 py-2 text-sm font-medium capitalize transition-colors ${activeTab === tab
-                        ? 'text-primary border-b-2 border-primary'
-                        : 'text-muted-foreground hover:text-foreground'
-                        }`}
+                      className={`px-4 py-2 text-sm font-medium capitalize transition-colors ${
+                        activeTab === tab
+                          ? 'text-primary border-b-2 border-primary'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
                     >
                       {tab}
                     </button>
@@ -282,7 +305,6 @@ export default function ExerciseWorkspace() {
                 {activeTab === 'explanation' && <ExplanationTab exerciseId={id!} />}
                 {activeTab === 'flowchart' && <FlowchartTab exerciseId={id!} />}
                 {activeTab === 'chat' && <ChatTab exerciseId={id!} currentCode={code} />}
-
                 {activeTab === 'tests' && (
                   <TestsTab
                     testCases={exercise.testCases || []}
@@ -290,9 +312,9 @@ export default function ExerciseWorkspace() {
                     language={exercise.language}
                     onRunTests={handleRunTests}
                     triggerRun={triggerTests}
+                    onAllTestsPassed={handleAllTestsPassed}
                   />
                 )}
-
               </div>
             </div>
           </Panel>
@@ -303,36 +325,19 @@ export default function ExerciseWorkspace() {
       <footer className="border-t bg-card px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex gap-2">
-            <Button
-              variant="default"
-              size="sm"
-              onClick={handleRunTestsFromFooter}
-            >
+            <Button variant="default" size="sm" onClick={handleRunTestsFromFooter}>
               Run Tests
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleResetCode}
-            >
+            <Button variant="outline" size="sm" onClick={handleResetCode}>
               Reset Code
             </Button>
           </div>
 
           <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleSaveSnapshot}
-            // disabled={!hasUnsavedChanges}
-            >
+            <Button variant="ghost" size="sm" onClick={handleSaveSnapshot}>
               Save Snapshot
             </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={handleViewSolution}
-            >
+            <Button variant="secondary" size="sm" onClick={handleViewSolution}>
               View Solution
             </Button>
           </div>
@@ -341,4 +346,3 @@ export default function ExerciseWorkspace() {
     </div>
   );
 }
-

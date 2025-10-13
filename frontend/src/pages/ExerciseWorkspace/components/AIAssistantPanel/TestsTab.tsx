@@ -21,9 +21,10 @@ interface TestsTabProps {
   language: string;
   onRunTests: () => void;
   triggerRun?: boolean;
+  onAllTestsPassed?: () => void;
 }
 
-export default function TestsTab({ testCases, currentCode, language, onRunTests, triggerRun }: TestsTabProps) {
+export default function TestsTab({ testCases, currentCode, language, onRunTests, triggerRun, onAllTestsPassed }: TestsTabProps) {
   const [results, setResults] = useState<TestResult[]>([]);
   const [isRunning, setIsRunning] = useState(false);
   const { celebrateAllTestsPassed, rewardElement } = useConfetti();
@@ -47,6 +48,9 @@ export default function TestsTab({ testCases, currentCode, language, onRunTests,
         toast.success(`All tests passed! 🎉 (${response.summary.passed}/${response.summary.total})`);
         // 🎊 CELEBRATE! All tests passed
         celebrateAllTestsPassed();
+        if (onAllTestsPassed) {
+          onAllTestsPassed();
+        }
       } else {
         toast.error(`${response.summary.failed} test(s) failed (${response.summary.passed}/${response.summary.total} passed)`);
       }
@@ -67,7 +71,7 @@ export default function TestsTab({ testCases, currentCode, language, onRunTests,
       setIsRunning(false);
     }
   };
-   useEffect(() => {
+  useEffect(() => {
     if (triggerRun) {
       handleRunTests();
     }
