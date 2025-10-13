@@ -85,8 +85,27 @@ export const getLeaderboard = async (limit = 10) => {
   }
 };
 
+export const useHint = async (
+  userId: string,
+  exerciseId: string,
+  hintLevel: number
+) => {
+  try {
+    const response = await axios.post(`${API_URL}/gamification/use-hint`, {
+      userId,
+      exerciseId,
+      hintLevel,
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error('Error using hint:', error);
+    throw new Error(error.response?.data?.message || 'Failed to use hint');
+  }
+};
+
 export const gamificationService = {
   getUserStats,
   completeExercise,
   getLeaderboard,
+  useHint,
 };

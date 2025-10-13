@@ -17,6 +17,7 @@ import EditorPanel from './components/EditorPanel';
 import ExplanationTab from './components/AIAssistantPanel/ExplanationTab';
 import FlowchartTab from './components/AIAssistantPanel/FlowchartTab';
 import TestsTab from './components/AIAssistantPanel/TestsTab';
+import HintsPanel from './components/AIAssistantPanel/HintsPanel';
 import ChatTab from './components/AIAssistantPanel/ChatTab';
 import { toast } from 'sonner';
 
@@ -34,7 +35,7 @@ export default function ExerciseWorkspace() {
   // State
   const [code, setCode] = useState('');
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [activeTab, setActiveTab] = useState<'explanation' | 'flowchart' | 'chat' | 'tests'>('explanation');
+  const [activeTab, setActiveTab] = useState<'explanation' | 'flowchart' | 'chat' | 'tests' | 'hints'>('explanation');
   const [triggerTests, setTriggerTests] = useState(false);
   const [startTime, setStartTime] = useState<number>(Date.now());
 
@@ -209,39 +210,39 @@ export default function ExerciseWorkspace() {
   return (
     <div className="h-screen flex flex-col bg-background">
       {/* Header */}
-   <header className="border-b bg-card px-4 py-3 flex items-center justify-between">
-  <div className="flex items-center gap-3">
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={() => navigate(`/exercises/${id}`)}
-      title="Exit Academy Mode"
-    >
-      <ArrowLeft className="h-5 w-5" />
-    </Button>
+      <header className="border-b bg-card px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate(`/exercises/${id}`)}
+            title="Exit Academy Mode"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
 
-    <div className="flex items-center gap-3">
-      <Sparkles className="h-5 w-5 text-primary" />
-      <div>
-        <h1 className="font-semibold text-lg leading-none">{exercise.title}</h1>
-        <p className="text-sm text-muted-foreground mt-1">Academy Workspace</p>
-      </div>
-    </div>
-  </div>
+          <div className="flex items-center gap-3">
+            <Sparkles className="h-5 w-5 text-primary" />
+            <div>
+              <h1 className="font-semibold text-lg leading-none">{exercise.title}</h1>
+              <p className="text-sm text-muted-foreground mt-1">Academy Workspace</p>
+            </div>
+          </div>
+        </div>
 
-  <div className="flex items-center gap-3">
-    {/* Stats Widget Compact */}
-    {user && stats && <StatsWidget stats={stats} compact />}
-    
-    {/* Exercise Info */}
-    <div className="flex items-center gap-2">
-      <Badge className={getDifficultyColor(exercise.difficulty)}>
-        {exercise.difficulty}
-      </Badge>
-      <Badge variant="outline">{exercise.language}</Badge>
-    </div>
-  </div>
-</header>
+        <div className="flex items-center gap-3">
+          {/* Stats Widget Compact */}
+          {user && stats && <StatsWidget stats={stats} compact />}
+
+          {/* Exercise Info */}
+          <div className="flex items-center gap-2">
+            <Badge className={getDifficultyColor(exercise.difficulty)}>
+              {exercise.difficulty}
+            </Badge>
+            <Badge variant="outline">{exercise.language}</Badge>
+          </div>
+        </div>
+      </header>
       {/* Main Content - Split Panels */}
       <div className="flex-1 overflow-hidden">
         <PanelGroup direction="horizontal">
@@ -284,15 +285,14 @@ export default function ExerciseWorkspace() {
               {/* Tabs */}
               <div className="border-b">
                 <div className="flex gap-1 px-2">
-                  {['explanation', 'flowchart', 'chat', 'tests'].map((tab) => (
+                  {['explanation', 'flowchart', 'chat', 'tests', 'hints'].map((tab) => (
                     <button
                       key={tab}
                       onClick={() => setActiveTab(tab as any)}
-                      className={`px-4 py-2 text-sm font-medium capitalize transition-colors ${
-                        activeTab === tab
+                      className={`px-4 py-2 text-sm font-medium capitalize transition-colors ${activeTab === tab
                           ? 'text-primary border-b-2 border-primary'
                           : 'text-muted-foreground hover:text-foreground'
-                      }`}
+                        }`}
                     >
                       {tab}
                     </button>
@@ -313,6 +313,13 @@ export default function ExerciseWorkspace() {
                     onRunTests={handleRunTests}
                     triggerRun={triggerTests}
                     onAllTestsPassed={handleAllTestsPassed}
+
+                  />
+                )}
+                {activeTab === 'hints' && (
+                  <HintsPanel
+                    exerciseId={id!}
+                    hints={exercise.hints || []}
                   />
                 )}
               </div>

@@ -102,3 +102,47 @@ export const getLeaderboard = async (_req: Request, res: Response) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+/**
+ * Use hint - Deduct XP
+ * POST /api/gamification/use-hint
+ */
+export const useHint = async (req: Request, res: Response) => {
+  try {
+    const { userId, exerciseId, hintLevel } = req.body;
+    
+    if (!userId || !exerciseId || !hintLevel) {
+      return res.status(400).json({
+        success: false,
+        message: 'userId, exerciseId, and hintLevel are required',
+      });
+    }
+    
+    const progress = await getOrCreateProgress(userId);
+    
+    // Deduct XP for using hint
+    const xpPenalty = 10;
+    progress.totalXP = Math.max(0, progress.totalXP - xpPenalty);
+    progress.calculateLevel();
+    
+    await progress.save();
+    
+    return res.json({
+      success: true,
+      data: {
+        xpDeducted: xpPenalty,
+        totalXP: progress.totalXP,
+        level: progress.level,
+      },
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to use hint',
+      error: error.message,
+    });
+  }
+};
+
+  
+  
