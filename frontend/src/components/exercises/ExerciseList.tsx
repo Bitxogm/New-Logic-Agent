@@ -19,7 +19,6 @@ export default function ExerciseList({ filters }: ExerciseListProps) {
     data: exercises,
     isLoading,
     isError,
-    error,
     refetch,
   } = useQuery({
     queryKey: ['exercises', filters],
@@ -63,7 +62,7 @@ export default function ExerciseList({ filters }: ExerciseListProps) {
         <FileX className="h-16 w-16 text-gray-400 mb-4" />
         <h3 className="text-lg font-semibold mb-2">No se encontraron ejercicios</h3>
         <p className="text-gray-600 dark:text-gray-400 mb-4">
-          {filters.search || filters.language || filters.difficulty
+          {filters.search || filters.language || filters.difficulty || filters.category
             ? 'Intenta con otros filtros'
             : 'Aún no hay ejercicios disponibles'}
         </p>

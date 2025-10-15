@@ -1,5 +1,5 @@
 import mongoose, { Schema, Model } from 'mongoose';
-import type { IExercise, DifficultyLevel, ProgrammingLanguage } from '../types';
+import type { IExercise, DifficultyLevel, ProgrammingLanguage, ExerciseCategory } from '../types';
 
 /**
  * Schema de Mongoose para TestCase
@@ -38,7 +38,6 @@ const exerciseSchema = new Schema<IExercise>({
     minlength: [10, 'La descripción debe tener al menos 10 caracteres'],
     maxlength: [5000, 'La descripción no puede exceder 5000 caracteres']
   },
-  // CAMBIADO: de "language" a "language" pero sin índice de texto en este campo
   language: {
     type: String,
     required: [true, 'El lenguaje es obligatorio'],
@@ -75,6 +74,19 @@ const exerciseSchema = new Schema<IExercise>({
     lowercase: true,
     trim: true
   }],
+  category: {
+    type: String,
+    required: [true, 'La categoría es obligatoria'],
+    lowercase: true,
+    enum: {
+      values: ['arrays', 'strings', 'loops', 'data-structures', 'algorithms', 'logic-math'] as ExerciseCategory[],
+      message: 'Categoría inválida: {VALUE}'
+    }
+  },
+  keywords: {
+    type: [String],
+    default: []
+  },
   testCases: [testCaseSchema],
   solution: {
     type: String,
@@ -92,12 +104,6 @@ const exerciseSchema = new Schema<IExercise>({
 /**
  * Índices para búsqueda eficiente
  */
-
-// Por ahora SIN índice de texto para evitar conflictos
-// Lo añadiremos después cuando MongoDB esté limpio
-
-// Índice compuesto para filtrado avanzado
-
 // Índice compuesto para filtrado común
 exerciseSchema.index({ 
   difficulty: 1, 
@@ -109,6 +115,11 @@ exerciseSchema.index({
   tags: 1 
 });
 
+// Índice para categoría
+exerciseSchema.index({ 
+  category: 1 
+});
+
 // Índice para ordenar por fecha
 exerciseSchema.index({ 
   createdAt: -1 
@@ -118,10 +129,18 @@ exerciseSchema.index({
  * Middleware pre-save
  */
 exerciseSchema.pre('save', function(next) {
+  // Normalizar tags
   if (this.tags && this.tags.length > 0) {
     this.tags = this.tags.map(tag => tag.toLowerCase().trim());
     this.tags = [...new Set(this.tags)];
   }
+  
+  // Normalizar keywords
+  if (this.keywords && this.keywords.length > 0) {
+    this.keywords = this.keywords.map(keyword => keyword.toLowerCase().trim());
+    this.keywords = [...new Set(this.keywords)];
+  }
+  
   next();
 });
 
@@ -143,6 +162,7 @@ exerciseSchema.methods.toJSON = function() {
 exerciseSchema.statics.findWithFilters = async function(filters: {
   difficulty?: DifficultyLevel;
   language?: ProgrammingLanguage;
+  category?: ExerciseCategory;
   tags?: string[];
   search?: string;
   page?: number;
@@ -158,12 +178,21 @@ exerciseSchema.statics.findWithFilters = async function(filters: {
     query.language = filters.language;
   }
 
+  if (filters.category) {
+    query.category = filters.category;
+  }
+
   if (filters.tags && filters.tags.length > 0) {
     query.tags = { $in: filters.tags };
   }
 
   if (filters.search) {
-    query.$text = { $search: filters.search };
+    // Búsqueda en título, descripción y keywords
+    query.$or = [
+      { title: { $regex: filters.search, $options: 'i' } },
+      { description: { $regex: filters.search, $options: 'i' } },
+      { keywords: { $in: [new RegExp(filters.search, 'i')] } }
+    ];
   }
 
   const page = filters.page || 1;

@@ -6,6 +6,7 @@
 export type {
   DifficultyLevel,
   ProgrammingLanguage,
+  ExerciseCategory,
   TestCase,
   IExercise,
   CreateExerciseDTO,

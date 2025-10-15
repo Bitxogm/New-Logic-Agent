@@ -8,7 +8,7 @@ export type DifficultyLevel = 'easy' | 'medium' | 'hard';
 /**
  * Lenguajes de programación soportados
  */
-export type ProgrammingLanguage = 
+export type ProgrammingLanguage =
   | 'python'
   | 'javascript'
   | 'typescript'
@@ -20,6 +20,14 @@ export type ProgrammingLanguage =
   | 'rust'
   | 'php'
   | 'ruby';
+
+export type ExerciseCategory =
+  | 'arrays'
+  | 'strings'
+  | 'loops'
+  | 'data-structures'
+  | 'algorithms'
+  | 'logic-math';
 
 /**
  * Caso de prueba para validar soluciones
@@ -50,6 +58,9 @@ export interface IExercise {
   difficulty: DifficultyLevel;
   /** Etiquetas para categorización (ej: arrays, algoritmos) */
   tags: string[];
+  category: ExerciseCategory;
+  /** Palabras clave para búsqueda avanzada */
+  keywords: string[];
   /** Casos de prueba para validar soluciones */
   testCases: TestCase[];
   /** Solución de referencia (opcional) */
@@ -77,6 +88,9 @@ export interface CreateExerciseDTO {
   difficulty: DifficultyLevel;
   /** Etiquetas opcionales */
   tags?: string[];
+  category: ExerciseCategory;
+  /** Palabras clave opcionales */
+  keywords?: string[];
   /** Casos de prueba opcionales */
   testCases?: TestCase[];
   /** Solución de referencia opcional */
@@ -93,6 +107,8 @@ export interface UpdateExerciseDTO {
   language?: ProgrammingLanguage;
   difficulty?: DifficultyLevel;
   tags?: string[];
+  category?: ExerciseCategory;
+  keywords?: string[];
   testCases?: TestCase[];
   solution?: string;
 }
@@ -108,6 +124,8 @@ export interface ExerciseResponse {
   language: ProgrammingLanguage;
   difficulty: DifficultyLevel;
   tags: string[];
+  category: ExerciseCategory;
+  keywords: string[];
   testCases: TestCase[];
   solution?: string;
   createdAt: string;
@@ -124,6 +142,8 @@ export interface ExerciseFilters {
   difficulty?: DifficultyLevel;
   /** Filtrar por lenguaje */
   language?: ProgrammingLanguage;
+  /** Filtrar por categoría */
+  category?: ExerciseCategory;
   /** Filtrar por etiquetas */
   tags?: string[];
   /** Número de página (para paginación) */

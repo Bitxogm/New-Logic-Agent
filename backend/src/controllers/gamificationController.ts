@@ -144,5 +144,84 @@ export const useHint = async (req: Request, res: Response) => {
   }
 };
 
+export const getProgressStats = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const { days = 7 } = req.query;
+    
+    const progress = await getOrCreateProgress(userId);
+    
+    // Get last N days of activity
+    const daysAgo = parseInt(days as string);
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - daysAgo);
+    
+    // Filter activity history
+    const recentActivity = progress.activityHistory
+      .filter(activity => new Date(activity.date) >= startDate)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    
+    // Calculate stats by language
+    const languageStats: Record<string, { count: number; totalTime: number }> = {};
+    
+    progress.exerciseStats.forEach(stat => {
+      // We'd need to store language in exerciseStats, for now use mock data
+      const lang = 'javascript'; // TODO: Add language field to exerciseStats
+      if (!languageStats[lang]) {
+        languageStats[lang] = { count: 0, totalTime: 0 };
+      }
+      languageStats[lang].count += 1;
+      languageStats[lang].totalTime += stat.timeSpent;
+    });
+    
+    // Calculate averages
+    const avgTimePerExercise = progress.exerciseStats.length > 0
+      ? progress.exerciseStats.reduce((sum, stat) => sum + stat.timeSpent, 0) / progress.exerciseStats.length
+      : 0;
+    
+    // Daily goal progress (today)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayActivity = progress.activityHistory.find(
+      a => new Date(a.date).toDateString() === today.toDateString()
+    );
+    const todayXP = todayActivity?.xpEarned || 0;
+    
+    // Weekly goal progress
+    const weekStart = new Date();
+    weekStart.setDate(weekStart.getDate() - 7);
+    const weeklyXP = progress.activityHistory
+      .filter(a => new Date(a.date) >= weekStart)
+      .reduce((sum, a) => sum + a.xpEarned, 0);
+    
+    return res.json({
+      success: true,
+      data: {
+        recentActivity,
+        languageStats,
+        avgTimePerExercise: Math.round(avgTimePerExercise),
+        goals: {
+          daily: {
+            target: progress.dailyGoal,
+            current: todayXP,
+            percentage: Math.min(100, Math.round((todayXP / progress.dailyGoal) * 100)),
+          },
+          weekly: {
+            target: progress.weeklyGoal,
+            current: weeklyXP,
+            percentage: Math.min(100, Math.round((weeklyXP / progress.weeklyGoal) * 100)),
+          },
+        },
+      },
+    });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: 'Failed to get progress stats',
+      error: error.message,
+    });
+  }
+};
+
   
   

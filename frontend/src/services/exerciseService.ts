@@ -19,6 +19,7 @@ class ExerciseService {
 
     if (filters?.language) params.append('language', filters.language);
     if (filters?.difficulty) params.append('difficulty', filters.difficulty);
+    if (filters?.category) params.append('category', filters.category);
     if (filters?.page) params.append('page', filters.page.toString());
     if (filters?.limit) params.append('limit', filters.limit.toString());
     if (filters?.search) params.append('search', filters.search);

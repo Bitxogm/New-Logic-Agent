@@ -33,6 +33,34 @@ export interface CompleteExerciseResponse {
     currentStreak: number;
   };
 }
+export interface ActivityData {
+  date: Date;
+  xpEarned: number;
+  exercisesCompleted: number;
+}
+
+export interface LanguageStats {
+  [language: string]: {
+    count: number;
+    totalTime: number;
+  };
+}
+
+export interface GoalProgress {
+  target: number;
+  current: number;
+  percentage: number;
+}
+
+export interface ProgressStats {
+  recentActivity: ActivityData[];
+  languageStats: LanguageStats;
+  avgTimePerExercise: number;
+  goals: {
+    daily: GoalProgress;
+    weekly: GoalProgress;
+  };
+}
 
 /**
  * Get user statistics
@@ -103,9 +131,20 @@ export const useHint = async (
   }
 };
 
+export const getProgressStats = async (userId: string, days = 7): Promise<ProgressStats> => {
+  try {
+    const response = await axios.get(`${API_URL}/gamification/progress/${userId}?days=${days}`);
+    return response.data.data;
+  } catch (error: any) {
+    console.error('Error getting progress stats:', error);
+    throw new Error(error.response?.data?.message || 'Failed to get progress stats');
+  }
+};
+
 export const gamificationService = {
   getUserStats,
   completeExercise,
   getLeaderboard,
   useHint,
+  getProgressStats,
 };

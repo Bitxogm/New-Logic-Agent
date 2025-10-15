@@ -15,7 +15,7 @@ export interface IUserProgress extends Document {
   userId: mongoose.Types.ObjectId;
   totalXP: number;
   level: number;
-  completedExercises: string[]; // Exercise IDs
+  completedExercises: string[];
   achievements: IAchievement[];
   currentStreak: number;
   longestStreak: number;
@@ -25,17 +25,26 @@ export interface IUserProgress extends Document {
     attempts: number;
     bestScore: number;
     completedAt?: Date;
-    timeSpent: number; // minutes
+    timeSpent: number;
   }[];
   badges: string[];
+  // ⬇️ AÑADIR ESTOS 3 ⬇️
+  dailyGoal: number;
+  weeklyGoal: number;
+  activityHistory: Array<{
+    date: Date;
+    xpEarned: number;
+    exercisesCompleted: number;
+  }>;
   createdAt: Date;
   updatedAt: Date;
+  
+  // Métodos
   calculateLevel(): number;
   addXP(amount: number): number;
   updateStreak(): number;
   unlockAchievement(achievement: IAchievement): boolean;
 }
-
 const achievementSchema = new Schema({
   id: { type: String, required: true },
   name: { type: String, required: true },
@@ -97,6 +106,19 @@ const userProgressSchema = new Schema<IUserProgress>(
     exerciseStats: [exerciseStatSchema],
     badges: [{
       type: String,
+    }],
+    dailyGoal: {
+      type: Number,
+      default: 50,
+    },
+    weeklyGoal: {
+      type: Number,
+      default: 300,
+    },
+    activityHistory: [{
+      date: { type: Date, required: true },
+      xpEarned: { type: Number, default: 0 },
+      exercisesCompleted: { type: Number, default: 0 },
     }],
   },
   {

@@ -38,6 +38,14 @@ export interface AuthResponse {
 
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
+export type ExerciseCategory =
+  | 'arrays'
+  | 'strings'
+  | 'loops'
+  | 'data-structures'
+  | 'algorithms'
+  | 'logic-math';
+  
 export interface TestCase {
   input: any[];
   expectedOutput: any;
@@ -51,6 +59,8 @@ export interface Exercise {
   difficulty: Difficulty;
   language: string;
   tags: string[];
+  category: ExerciseCategory;
+  keywords: string[];
   testCases: TestCase[];
   solution?: string;
   starterCode?: string; // 👈 NUEVA PROPIEDAD
@@ -66,6 +76,8 @@ export interface CreateExerciseData {
   difficulty: Difficulty;
   language: string;
   tags?: string[];
+  category: ExerciseCategory;
+  keywords?: string[];
   testCases: TestCase[];
   solution?: string;
   starterCode?: string; // 👈 NUEVA PROPIEDAD
@@ -78,6 +90,8 @@ export interface UpdateExerciseData {
   difficulty?: Difficulty;
   language?: string;
   tags?: string[];
+  category: ExerciseCategory;
+  keywords?: string[];
   testCases?: TestCase[];
   solution?: string;
   starterCode?: string; // 👈 NUEVA PROPIEDAD
@@ -87,6 +101,7 @@ export interface UpdateExerciseData {
 export interface ExerciseFilters {
   language?: string;
   difficulty?: Difficulty;
+  category?: ExerciseCategory;
   page?: number;
   limit?: number;
   search?: string;
@@ -226,7 +241,7 @@ export interface SendMessageResponse {
  * ============================================
  */
 
-export type FlowchartNodeType = 
+export type FlowchartNodeType =
   | 'start'
   | 'end'
   | 'process'

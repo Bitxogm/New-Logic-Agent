@@ -2,7 +2,10 @@
 
 import { useAuthStore } from '@/store/authStore';
 import { useGamification } from '@/hooks/useGamification';
+import { useProgressStats } from '@/hooks/useProgressStats';
 import StatsWidget from '@/components/gamification/StatsWidget';
+import ProgressChart from '@/components/gamification/ProgressChart';
+import GoalsWidget from '@/components/gamification/GoalsWidget';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BookOpen, Code, Trophy, TrendingUp } from 'lucide-react';
@@ -11,6 +14,7 @@ import { Link } from 'react-router-dom';
 export default function Dashboard() {
   const { user } = useAuthStore();
   const { stats, isLoading } = useGamification(user?._id || null);
+  const { data: progressStats } = useProgressStats(user?._id || null);
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -24,9 +28,7 @@ export default function Dashboard() {
 
       {/* Stats Widget */}
       <div className="grid gap-6 md:grid-cols-3">
-        <div className="md:col-span-2">
-          <StatsWidget stats={stats} />
-        </div>
+        <StatsWidget stats={stats} />
 
         {/* Quick Actions */}
         <Card>
@@ -96,6 +98,12 @@ export default function Dashboard() {
             </p>
           </CardContent>
         </Card>
+      </div>
+      <div className="grid gap-6 md:grid-cols-3">
+        <div className="md:col-span-2">
+          <ProgressChart stats={progressStats} />
+        </div>
+        <GoalsWidget stats={progressStats} />
       </div>
 
       {/* Recent Activity */}

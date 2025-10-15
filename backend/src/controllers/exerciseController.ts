@@ -30,13 +30,17 @@ export class ExerciseController {
 
       // Construir filtros
       const filters: Record<string, unknown> = {};
-      
+
       if (req.query.difficulty) {
         filters.difficulty = req.query.difficulty;
       }
-      
+
       if (req.query.language) {
         filters.language = req.query.language;
+      }
+
+      if (req.query.category) {
+        filters.category = req.query.category;
       }
 
       if (req.query.search) {
@@ -159,6 +163,8 @@ export class ExerciseController {
         language: languageValidation.sanitized! as ProgrammingLanguage,
         difficulty: difficultyValidation.sanitized! as any,
         tags: exerciseData.tags,
+        category: exerciseData.category,
+        keywords: exerciseData.keywords,
         testCases: exerciseData.testCases,
         solution: exerciseData.solution
       };
@@ -230,7 +236,7 @@ export class ExerciseController {
         if (!validation.isValid) {
           throw new AppError(validation.error!, 400);
         }
-        updates.language = validation.sanitized! as ProgrammingLanguage ;
+        updates.language = validation.sanitized! as ProgrammingLanguage;
       }
 
       // Actualizar ejercicio
