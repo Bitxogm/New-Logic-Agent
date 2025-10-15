@@ -38,6 +38,7 @@
     "react-resizable-panels": "^3.0.6",
     "react-rewards": "^2.1.0",
     "react-router-dom": "^7.9.3",
+    "recharts": "^3.2.1",
     "remark-gfm": "^4.0.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",

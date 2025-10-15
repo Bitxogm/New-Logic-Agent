@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Code2, User, LogOut, LayoutDashboard, PlusCircle } from 'lucide-react';
+import { Code2, User, LogOut, LayoutDashboard, PlusCircle, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
 
 /**
@@ -45,7 +45,7 @@ export default function Header() {
           >
             Ejercicios
           </Link>
-          
+
           {isAuthenticated && (
             <>
               <Link
@@ -54,6 +54,14 @@ export default function Header() {
               >
                 Dashboard
               </Link>
+
+              <Link
+                to="/analytics"
+                className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors dark:text-gray-300 dark:hover:text-blue-400"
+              >
+                Analytics
+              </Link>
+
               <Link
                 to="/exercises/create"
                 className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors dark:text-gray-300 dark:hover:text-blue-400"
@@ -81,6 +89,11 @@ export default function Header() {
                   <LayoutDashboard className="mr-2 h-4 w-4" />
                   Dashboard
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/analytics')}>
+                  <BarChart3 className="mr-2 h-4 w-4" />
+                  Analytics
+                </DropdownMenuItem>
+
                 <DropdownMenuItem onClick={() => navigate('/exercises/create')}>
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Crear Ejercicio

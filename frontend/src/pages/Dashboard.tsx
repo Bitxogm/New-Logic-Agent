@@ -8,7 +8,7 @@ import ProgressChart from '@/components/gamification/ProgressChart';
 import GoalsWidget from '@/components/gamification/GoalsWidget';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Code, Trophy, TrendingUp } from 'lucide-react';
+import { BookOpen, Code, Trophy, TrendingUp, BarChart3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Dashboard() {
@@ -48,6 +48,14 @@ export default function Dashboard() {
                 Start Easy
               </Link>
             </Button>
+            <Button asChild variant="outline" className="w-full justify-start">
+              <Link to="/analytics">
+                <BarChart3 className="mr-2 h-4 w-4" />
+                View Analytics
+              </Link>
+            </Button>
+
+
           </CardContent>
         </Card>
       </div>

@@ -15,6 +15,8 @@ import { validateEnv } from './config/env.config';
 import aiRoutes from './routes/ai';
 import testExecutionRoutes from './routes/testExecution';
 import gamificationRoutes from './routes/gamification';
+import analyticsRoutes from './routes/analytics';
+
 
 // Cargar variables de entorno
 dotenv.config();
@@ -104,6 +106,7 @@ function createApp(): Express {
   app.use('/api/ai', aiRoutes);
   app.use('/api/test-execution', testExecutionRoutes);
   app.use('/api/gamification', gamificationRoutes);
+  app.use('/api/analytics', analyticsRoutes);
 
   // Manejo de errores
   app.use(notFoundHandler);

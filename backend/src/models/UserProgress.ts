@@ -26,6 +26,10 @@ export interface IUserProgress extends Document {
     bestScore: number;
     completedAt?: Date;
     timeSpent: number;
+    difficulty: 'easy' | 'medium' | 'hard';
+    language: string;
+    category: string;
+    xpEarned: number;
   }[];
   badges: string[];
   // ⬇️ AÑADIR ESTOS 3 ⬇️
@@ -38,7 +42,7 @@ export interface IUserProgress extends Document {
   }>;
   createdAt: Date;
   updatedAt: Date;
-  
+
   // Métodos
   calculateLevel(): number;
   addXP(amount: number): number;
@@ -64,6 +68,23 @@ const exerciseStatSchema = new Schema({
   bestScore: { type: Number, default: 0 },
   completedAt: { type: Date },
   timeSpent: { type: Number, default: 0 },
+  difficulty: {
+    type: String,
+    enum: ['easy', 'medium', 'hard'],
+    required: true
+  },
+  language: {
+    type: String,
+    required: true
+  },
+  category: {
+    type: String,
+    required: true
+  },
+  xpEarned: {
+    type: Number,
+    default: 0
+  },
 });
 
 const userProgressSchema = new Schema<IUserProgress>(

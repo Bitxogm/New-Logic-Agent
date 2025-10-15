@@ -15,6 +15,7 @@ import Exercises from './pages/Exercises';
 import ExerciseDetail from './pages/ExerciseDetail';
 import CreateExercise from './pages/CreateExercise';
 import ExerciseWorkspace from '@/pages/ExerciseWorkspace/ExerciseWorkspace';
+import Analytics from './pages/Analytics';
 
 /**
  * QueryClient para React Query
@@ -65,7 +66,7 @@ function App() {
           <Routes>
             {/* Rutas públicas */}
             <Route path="/" element={<Home />} />
-            
+
             <Route
               path="/login"
               element={
@@ -74,7 +75,7 @@ function App() {
                 </PublicRoute>
               }
             />
-            
+
             <Route
               path="/register"
               element={
@@ -95,6 +96,15 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/analytics"
+              element={
+                <ProtectedRoute>
+                  <Analytics />
                 </ProtectedRoute>
               }
             />
