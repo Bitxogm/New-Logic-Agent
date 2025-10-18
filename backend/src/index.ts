@@ -16,6 +16,7 @@ import aiRoutes from './routes/ai';
 import testExecutionRoutes from './routes/testExecution';
 import gamificationRoutes from './routes/gamification';
 import analyticsRoutes from './routes/analytics';
+import seedRoutes from './routes/seed';
 
 
 // Cargar variables de entorno
@@ -107,6 +108,7 @@ function createApp(): Express {
   app.use('/api/test-execution', testExecutionRoutes);
   app.use('/api/gamification', gamificationRoutes);
   app.use('/api/analytics', analyticsRoutes);
+  app.use('/api', seedRoutes);
 
   // Manejo de errores
   app.use(notFoundHandler);
