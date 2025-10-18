@@ -1,279 +1,174 @@
-# 🚀 AgentLogic - Tutor de Lógica con IA
+# 🚀 AgentLogic Academy
 
-> Plataforma educativa potenciada por IA para aprender programación a través de ejercicios interactivos, diagramas de flujo y generación de código.
+> **AI-Powered Programming Learning Platform** - Your personal coding tutor powered by Google Gemini 2.0
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-18+-green)](https://nodejs.org/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-7.0-brightgreen)](https://www.mongodb.com/)
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue)](https://www.docker.com/)
-[![Swagger](https://img.shields.io/badge/API-Documented-85EA2D)](http://localhost:5000/api-docs)
-
----
-
-## 📋 Tabla de Contenidos
-
-- [✨ Características](#-características)
-- [Stack Tecnológico](#️-stack-tecnológico)
-- [Metodologías Aplicadas](#-metodologías-aplicadas)
-- [Estructura del Proyecto](#-estructura-del-proyecto)
-- [Instalación](#-instalación)
-- [Uso](#-uso)
-- [API Endpoints](#-api-endpoints)
-- [Testing](#-testing)
-- [Seguridad](#-seguridad)
-- [Comandos Útiles](#-comandos-útiles)
-- [Estado del Proyecto](#-estado-del-proyecto)
-- [Contribuir](#-contribuir)
+[![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-7.0-green.svg)](https://www.mongodb.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ---
 
-## ✨ Características
+## 📋 Table of Contents
 
-### 🎯 Core Features
-- **Gestión de Ejercicios**: CRUD completo de ejercicios de programación
-- **Múltiples Lenguajes**: Soporte para Python, JavaScript, TypeScript, Java, C++, y más
-- **Dificultad Adaptativa**: Sistema de niveles (easy, medium, hard)
-- **Casos de Prueba**: Validación automática de soluciones
-- **Búsqueda Avanzada**: Filtrado por lenguaje, dificultad y tags
-- **API RESTful**: 12 endpoints completamente documentados
-
-### 🤖 Inteligencia Artificial (Gemini 2.0)
-- **Generación de Código**: Soluciones completas con explicación
-- **Análisis de Código**: Detección de bugs y sugerencias de mejora
-- **Explicación de Conceptos**: Tutor IA para aprendizaje personalizado
-- **Rate Limiting IA**: Protección contra abuso (10 req/15min)
-
-### 🔐 Autenticación & Seguridad
-- **JWT Authentication**: Tokens de acceso seguros
-- **Password Hashing**: Bcrypt con salt rounds
-- **Rate Limiting**: Protección contra ataques de fuerza bruta
-- **Input Validation**: Sanitización completa de inputs
-- **Security Headers**: Helmet para headers HTTP seguros
-- **CORS**: Control de acceso cross-origin
-
-### 📊 Logging Profesional
-- **Winston Logger**: Sistema de logs estructurado
-- **Múltiples Niveles**: error, warn, info, http, debug
-- **Sanitización Automática**: Passwords y tokens redactados
-- **Archivos Separados**: error.log, combined.log
-- **Formato JSON**: Para producción y análisis
-- **Logs Colorizados**: Para desarrollo
-
-### 🛡️ Rate Limiting
-- **Límite General**: 100 peticiones/15 min por IP
-- **Límite Login**: 5 intentos/15 min por IP
-- **Límite Registro**: 3 registros/hora por IP
-- **Límite IA**: 10 peticiones/15 min por usuario
-- **Detección de Ataques**: Logging automático de rate limits
-
-### 🧪 Calidad de Código
-- **TDD (Test-Driven Development)**: Tests antes del código
-- **TypeScript Estricto**: Tipado completo
-- **Testing Setup**: Vitest con coverage
-- **JSDoc**: Documentación inline
-- **Swagger UI**: Documentación interactiva
+- [About](#about)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Environment Variables](#environment-variables)
+- [Running the Application](#running-the-application)
+- [Project Structure](#project-structure)
+- [API Documentation](#api-documentation)
+- [Scripts](#scripts)
+- [Contributing](#contributing)
+- [License](#license)
 
 ---
 
-## 🛠️ Stack Tecnológico
+## 🎯 About
+
+**AgentLogic Academy** is a full-stack AI-powered programming learning platform where **Gemini 2.0 acts as your personal tutor**. It's not just an exercise platform - it's a complete learning ecosystem with real-time AI assistance, interactive code execution, gamification, and advanced analytics.
+
+### Why AgentLogic Academy?
+
+- 🤖 **AI-Powered Learning**: Real-time code analysis and personalized guidance from Gemini 2.0
+- 💻 **Interactive Workspace**: Monaco Editor with syntax highlighting for 10+ languages
+- 🧪 **Real Code Execution**: Execute Python and JavaScript code with instant feedback
+- 🎮 **Gamification**: XP system, achievements, streaks, and leaderboards
+- 📊 **Advanced Analytics**: Track your progress with beautiful visualizations
+- 🔍 **Smart Search**: Advanced filtering by language, difficulty, and category
+- 💡 **Hints System**: Progressive hints with XP penalties for balanced learning
+
+---
+
+## ✨ Features
+
+### 🎓 Learning Features
+
+- **30+ Diverse Exercises** across 6 categories (Arrays, Strings, Loops, Data Structures, Algorithms, Logic & Math)
+- **Multi-Language Support**: Python, JavaScript, TypeScript, Java, C++, and more
+- **AI Assistant with 5 Tabs**:
+  - 📝 **Explanation**: Exercise breakdown with roadmap
+  - 📊 **Flowchart**: Visual algorithm representation with Mermaid
+  - 💬 **Chat**: Contextual Q&A with Gemini
+  - ✅ **Tests**: Real-time test execution
+  - 💡 **Hints**: Progressive learning aids
+- **Code Templates**: 25+ ready-to-use snippets
+- **Real-time Code Analysis**: Instant feedback on your approach
+
+### 🎮 Gamification
+
+- **XP & Level System**: Earn experience points by solving exercises
+- **Achievements & Badges**: Unlock special milestones
+- **Streak System**: Maintain daily consistency
+- **Goals**: Daily and weekly XP targets
+- **Celebrations**: Epic confetti animations on completion
+
+### 📊 Analytics Dashboard
+
+- **Activity Heatmap**: GitHub-style activity calendar (90 days)
+- **Language Statistics**: Track your progress per language
+- **Difficulty Distribution**: Visualize your skill growth
+- **Progress Charts**: Weekly XP trends
+
+### 🔍 Search & Filters
+
+- **Smart Search**: Find exercises by title, description, or keywords
+- **Category Filters**: 6 visual categories with icons
+- **Multi-Criteria Filtering**: Combine language, difficulty, and category
+- **Quick Filters**: Unsolved, Recent, Popular
+
+---
+
+## 🛠️ Tech Stack
 
 ### Backend
-```
-├── Node.js 18+          # Runtime JavaScript
-├── TypeScript 5.0       # Tipado estático
-├── Express.js 5.1       # Framework web
-├── MongoDB 7.0          # Base de datos NoSQL
-├── Mongoose 8.19        # ODM para MongoDB
-├── Winston              # Logger profesional
-├── Bcrypt               # Hashing de passwords
-├── JWT                  # JSON Web Tokens
-├── Express Rate Limit   # Rate limiting
-├── Helmet               # Security headers
-├── Swagger UI           # Documentación API interactiva
-├── Google Gemini 2.0    # IA para generación y análisis
-└── Vitest               # Framework de testing
-```
 
-### Frontend (Próximamente)
-```
-├── React 18             # Biblioteca UI
-├── TypeScript           # Tipado estático
-├── Vite                 # Build tool
-├── shadcn/ui            # Componentes modernos
-├── Tailwind CSS         # Utilidades CSS
-└── React Router         # Routing
-```
+- **Runtime**: Node.js 18+
+- **Framework**: Express 5.1
+- **Language**: TypeScript 5.0
+- **Database**: MongoDB 7.0 + Mongoose
+- **Authentication**: JWT + bcrypt
+- **AI**: Google Gemini 2.0 Flash
+- **Logging**: Winston
+- **Security**: Helmet, CORS, Rate Limiting
+- **Testing**: Vitest
+- **Documentation**: Swagger UI
 
-### DevOps
-```
-├── Docker               # Contenedores
-├── Docker Compose       # Orquestación
-└── GitHub Actions       # CI/CD (próximamente)
-```
+### Frontend
+
+- **Framework**: React 18
+- **Language**: TypeScript 5.0
+- **Build Tool**: Vite 7.1
+- **State Management**: 
+  - Zustand (auth state)
+  - TanStack Query (server state)
+- **UI Library**: shadcn/ui (New York style)
+- **Styling**: Tailwind CSS 3.3
+- **Code Editor**: Monaco Editor
+- **Charts**: Recharts
+- **Router**: React Router v6
+- **Forms**: react-hook-form + Zod
+- **Notifications**: Sonner
 
 ---
 
-## 🎓 Metodologías Aplicadas
+## 📦 Prerequisites
 
-### 1. TDD (Test-Driven Development)
-Escribimos tests **antes** del código siguiendo el ciclo:
+Before you begin, ensure you have the following installed:
 
-🔴 **RED** → Escribir test que falla  
-🟢 **GREEN** → Escribir código mínimo para pasar  
-🔵 **REFACTOR** → Mejorar el código
-
-**Ejemplo:**
-```typescript
-// 1. RED: Escribir un test que falla
-it('debe validar email', () => {
-  expect(validateEmail('test@ejemplo.com').isValid).toBe(true);
-  expect(validateEmail('test@ejemplo').isValid).toBe(false);
-});
-
-// 2. GREEN: Escribir el código mínimo para que el test pase
-function validateEmail(email: string) {
-  return { isValid: /\S+@\S+\.\S+/.test(email) };
-}
-
-// 3. REFACTOR: Mejorar el código sin cambiar su comportamiento
-```
-
-### 2. Security by Design
-Pensamos en la seguridad desde el diseño inicial de cada componente.
-
-```typescript
-// ✅ Validación de entradas desde el principio
-const DANGEROUS_PATTERNS = [/<script/i, /javascript:/i, /on\w+\s*=/i];
-
-function validateSafeInput(input: string) {
-  if (DANGEROUS_PATTERNS.some(pattern => pattern.test(input))) {
-    return { isValid: false, error: 'La entrada contiene contenido no permitido.' };
-  }
-  return { isValid: true };
-}
-```
-
-### 3. Clean Architecture
-Separación clara de responsabilidades:
-
-`Types` → `Models` → `Controllers` → `Routes`
+- **Node.js** 18 or higher ([Download](https://nodejs.org/))
+- **npm** or **yarn**
+- **MongoDB** 7.0 or higher ([Download](https://www.mongodb.com/try/download/community))
+- **Git** ([Download](https://git-scm.com/))
+- **Google Gemini API Key** ([Get one](https://aistudio.google.com/app/apikey))
 
 ---
 
-## 📁 Estructura del Proyecto
+## 🚀 Installation
 
-```
-AgentLogic-TS/
-├── backend/                 # API Node.js + Express
-│   ├── src/
-│   │   ├── config/         # Configuraciones
-│   │   │   ├── database.ts       # Conexión MongoDB
-│   │   │   ├── logger.config.ts  # Winston Logger
-│   │   │   ├── env.config.ts     # Variables de entorno
-│   │   │   └── swagger.config.ts # Swagger UI
-│   │   │
-│   │   ├── types/          # Tipos TypeScript
-│   │   │   ├── exercise.types.ts
-│   │   │   ├── user.types.ts
-│   │   │   ├── ai.types.ts
-│   │   │   └── api.types.ts
-│   │   │
-│   │   ├── models/         # Modelos Mongoose
-│   │   │   ├── Exercise.ts
-│   │   │   └── User.ts
-│   │   │
-│   │   ├── controllers/    # Lógica de negocio
-│   │   │   ├── exerciseController.ts
-│   │   │   ├── authController.ts
-│   │   │   └── aiController.ts
-│   │   │
-│   │   ├── routes/         # Rutas HTTP
-│   │   │   ├── exercises.ts
-│   │   │   ├── auth.ts
-│   │   │   └── ai.ts
-│   │   │
-│   │   ├── middleware/     # Middleware Express
-│   │   │   ├── auth.ts           # JWT authentication
-│   │   │   ├── errorHandler.ts   # Manejo de errores
-│   │   │   ├── validateRequest.ts # Validación
-│   │   │   ├── logger.middleware.ts # HTTP logging
-│   │   │   ├── rateLimiter.ts    # Rate limiting
-│   │   │   └── security.ts       # Security headers
-│   │   │
-│   │   ├── services/       # Servicios externos
-│   │   │   ├── gemini.service.ts # Google Gemini AI
-│   │   │   └── jwtService.ts     # JWT tokens
-│   │   │
-│   │   ├── utils/          # Utilidades
-│   │   │   ├── exercise.validator.ts
-│   │   │   └── user.validator.ts
-│   │   │
-│   │   ├── tests/          # Tests
-│   │   │   ├── unit/       # Tests unitarios
-│   │   │   └── integration/# Tests de integración
-│   │   │
-│   │   └── index.ts        # Punto de entrada
-│   │
-│   ├── logs/               # Archivos de log
-│   │   ├── error.log       # Solo errores
-│   │   └── combined.log    # Todos los logs
-│   │
-│   ├── coverage/           # Cobertura de tests
-│   ├── .env                # Variables de entorno
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── vitest.config.ts
-│
-├── frontend/               # App React (próximamente)
-├── docs/                   # Documentación
-│   ├── API.md
-│   ├── AUTHENTICATION.md
-│   ├── DEVELOPMENT.md
-│   ├── LOGGING.md
-│   ├── RATE_LIMITING.md
-│   ├── SECURITY.md
-│   └── TESTING.md
-│
-├── scripts/                # Scripts útiles
-│   └── check-secrets.sh
-│
-├── docker-compose.yml      # Docker Compose
-└── README.md
-```
-
----
-
-## 🚀 Inicio Rápido
-
-### Instalar todas las dependencias
-```bash
-npm run install:all
-
-Lanzar desarrollo (backend + frontend)
-bashnpm run dev
-
-### Requisitos Previos
-
-- Node.js 18 o superior
-- Docker y Docker Compose (para MongoDB)
-- Git
-- Cuenta de Google Cloud (para Gemini API)
-
-### 1. Clonar el Repositorio
+### 1. Clone the repository
 ```bash
 git clone https://github.com/Bitxogm/New-Logic-Agent.git
 cd New-Logic-Agent
 ```
 
-### 2. Instalar Dependencias del Backend
+### 2. Install Backend Dependencies
 ```bash
 cd backend
 npm install
 ```
 
-### 3. Configurar Variables de Entorno
-Crea un archivo `.env` en la carpeta `backend/`:
+### 3. Install Frontend Dependencies
+```bash
+cd ../frontend
+npm install
+```
 
+### 4. Set up MongoDB
+
+**Option A: Local MongoDB**
+```bash
+# Start MongoDB service
+sudo systemctl start mongod  # Linux
+brew services start mongodb-community  # macOS
+# Or use MongoDB Compass
+```
+
+**Option B: Docker**
+```bash
+docker run -d -p 27017:27017 --name mongodb mongo:7.0
+```
+
+---
+
+## 🔐 Environment Variables
+
+### Backend `.env`
+
+Create `backend/.env` file:
 ```env
 # Server
 PORT=5000
@@ -283,369 +178,297 @@ NODE_ENV=development
 MONGODB_URI=mongodb://localhost:27017/agentlogic
 
 # JWT
-JWT_SECRET=tu_secreto_super_seguro_cambiar_en_produccion
+JWT_SECRET=your_super_secret_jwt_key_change_this_in_production
 JWT_EXPIRES_IN=7d
+
+# Google Gemini AI
+GEMINI_API_KEY=your_gemini_api_key_here
 
 # CORS
 CORS_ORIGIN=http://localhost:5173
-
-# Google Gemini AI
-GEMINI_API_KEY=tu_api_key_de_google_gemini
 ```
 
-### 4. Iniciar MongoDB con Docker
-```bash
-# Desde la raíz del proyecto
-docker-compose up -d
+### Frontend `.env`
+
+Create `frontend/.env` file:
+```env
+VITE_API_URL=http://localhost:5000/api
 ```
 
-### 5. Iniciar Servidor de Desarrollo
+### 🔑 Getting a Gemini API Key
+
+1. Go to [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Click "Create API Key"
+3. Copy the key and paste it in `backend/.env`
+
+---
+
+## 🏃 Running the Application
+
+### Development Mode
+
+**Terminal 1 - Backend:**
 ```bash
 cd backend
 npm run dev
 ```
+Backend will run on `http://localhost:5000`
 
-El servidor estará disponible en: **http://localhost:5000**
-
-### 6. Verificar Instalación
+**Terminal 2 - Frontend:**
 ```bash
-# Health check
-curl http://localhost:5000/health
+cd frontend
+npm run dev
+```
+Frontend will run on `http://localhost:5173`
 
-# Ver Swagger UI
-# Abre en el navegador: http://localhost:5000/api-docs
+**Terminal 3 - Seed Database (Optional):**
+```bash
+cd backend
+npm run seed
+```
+This will populate the database with 30 sample exercises.
+
+### Production Mode
+
+**Build Backend:**
+```bash
+cd backend
+npm run build
+npm start
+```
+
+**Build Frontend:**
+```bash
+cd frontend
+npm run build
+npm run preview
 ```
 
 ---
 
-## 💻 Uso
-
-### 🌐 Swagger UI - Documentación Interactiva
-
-La forma más fácil de probar la API es usando Swagger UI:
-
-**http://localhost:5000/api-docs**
-
-Desde ahí puedes:
-- Ver todos los endpoints organizados
-- Probar cada endpoint directamente
-- Ver esquemas de request/response
-- Autenticarte con JWT
-
----
-
-### 📝 Ejemplos con cURL
-
-#### Health Check
-```bash
-curl http://localhost:5000/health
+## 📁 Project Structure
 ```
-
-#### Registrar un Usuario
-```bash
-curl -X POST http://localhost:5000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "Password123!",
-    "username": "usuario",
-    "name": "Usuario Test"
-  }'
-```
-
-#### Iniciar Sesión
-```bash
-curl -X POST http://localhost:5000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "user@example.com",
-    "password": "Password123!"
-  }'
-```
-
-Guarda el `token` de la respuesta para usarlo en endpoints protegidos.
-
-#### Crear un Ejercicio (Requiere Autenticación)
-```bash
-curl -X POST http://localhost:5000/api/exercises \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer TU_TOKEN_AQUI" \
-  -d '{
-    "title": "Suma de dos números",
-    "description": "Escribe una función que sume dos números",
-    "difficulty": "easy",
-    "language": "javascript",
-    "testCases": [
-      {
-        "input": [2, 3],
-        "expectedOutput": 5
-      }
-    ],
-    "tags": ["básico", "matemáticas"]
-  }'
-```
-
-#### Generar Solución con IA
-```bash
-curl -X POST http://localhost:5000/api/ai/generate-solution \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer TU_TOKEN_AQUI" \
-  -d '{
-    "problem": "Crea una función que sume dos números",
-    "language": "javascript",
-    "difficulty": "easy"
-  }'
-```
-
-#### Analizar Código con IA
-```bash
-curl -X POST http://localhost:5000/api/ai/analyze-code \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer TU_TOKEN_AQUI" \
-  -d '{
-    "code": "function sum(a, b) { return a + b; }",
-    "language": "javascript",
-    "focusAreas": ["performance", "readability"]
-  }'
+AgentLogic-Academy/
+├── backend/
+│   ├── src/
+│   │   ├── config/          # Database, Swagger, Logger config
+│   │   ├── controllers/     # Route handlers
+│   │   ├── middleware/      # Auth, validation, error handling
+│   │   ├── models/          # Mongoose schemas
+│   │   ├── routes/          # API routes
+│   │   ├── services/        # Business logic (Gemini, etc.)
+│   │   ├── types/           # TypeScript type definitions
+│   │   └── utils/           # Helper functions
+│   ├── scripts/             # Seed scripts
+│   └── tests/               # Unit and integration tests
+│
+└── frontend/
+    └── src/
+        ├── components/      # React components
+        │   ├── analytics/   # Analytics visualizations
+        │   ├── editor/      # Monaco editor wrapper
+        │   ├── exercises/   # Exercise-related components
+        │   ├── gamification/ # XP, achievements, stats
+        │   ├── layout/      # Header, Footer, Layout
+        │   ├── ui/          # shadcn/ui components
+        │   └── workspace/   # Template selector
+        ├── data/            # Static data (templates)
+        ├── hooks/           # Custom React hooks
+        ├── pages/           # Page components
+        ├── services/        # API services
+        ├── store/           # Zustand stores
+        └── types/           # TypeScript types
 ```
 
 ---
 
-## 📡 API Endpoints
+## 📚 API Documentation
 
-### Authentication
-| Método | Endpoint | Descripción | Auth | Rate Limit |
-|--------|----------|-------------|------|------------|
-| POST | `/api/auth/register` | Registrar nuevo usuario | No | 3/hora |
-| POST | `/api/auth/login` | Iniciar sesión | No | 5/15min |
-| GET | `/api/auth/me` | Obtener perfil del usuario actual | Sí | 100/15min |
+Once the backend is running, visit:
 
-### Exercises
-| Método | Endpoint | Descripción | Auth | Filtros |
-|--------|----------|-------------|------|---------|
-| GET | `/api/exercises` | Listar ejercicios | No | language, difficulty, page, limit |
-| GET | `/api/exercises/:id` | Obtener ejercicio por ID | No | - |
-| POST | `/api/exercises` | Crear nuevo ejercicio | Sí | - |
-| PATCH | `/api/exercises/:id` | Actualizar ejercicio | Sí | - |
-| DELETE | `/api/exercises/:id` | Eliminar ejercicio | Sí | - |
+**Swagger UI**: [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
 
-### AI (Gemini 2.0)
-| Método | Endpoint | Descripción | Auth | Rate Limit |
-|--------|----------|-------------|------|------------|
-| POST | `/api/ai/generate-solution` | Generar solución de código con IA | Sí | 10/15min |
-| POST | `/api/ai/analyze-code` | Analizar código (bugs, mejoras, complejidad) | Sí | 10/15min |
-| POST | `/api/ai/explain` | Explicar concepto de programación | Sí | 10/15min |
+### Key Endpoints
 
-### Health
-| Método | Endpoint | Descripción | Auth |
-|--------|----------|-------------|------|
-| GET | `/health` | Estado del servidor y conexión DB | No |
+#### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login user
+- `GET /api/auth/me` - Get current user
 
----
+#### Exercises
+- `GET /api/exercises` - List exercises (with filters)
+- `GET /api/exercises/:id` - Get exercise by ID
+- `POST /api/exercises` - Create exercise
+- `PATCH /api/exercises/:id` - Update exercise
+- `DELETE /api/exercises/:id` - Delete exercise
 
-### 📖 Documentación Completa
+#### AI Features
+- `POST /api/ai/generate-solution` - Generate solution
+- `POST /api/ai/analyze-code` - Analyze code
+- `POST /api/ai/explain-concept` - Explain concept
+- `POST /api/ai/analyze-exercise` - Analyze exercise
+- `POST /api/ai/analyze-progress` - Analyze progress
 
-**Swagger UI**: http://localhost:5000/api-docs
+#### Gamification
+- `GET /api/gamification/stats/:userId` - Get user stats
+- `POST /api/gamification/complete-exercise` - Complete exercise
+- `POST /api/gamification/use-hint` - Use hint (XP penalty)
+- `GET /api/gamification/progress/:userId` - Get progress
 
-Toda la API está documentada con Swagger, donde puedes:
-- ✅ Ver todos los endpoints organizados por categorías
-- ✅ Probar endpoints directamente desde el navegador
-- ✅ Ver esquemas de request/response con ejemplos
-- ✅ Autenticarte con JWT usando el botón "Authorize"
-- ✅ Ver códigos de estado y posibles errores
+#### Analytics
+- `GET /api/analytics/heatmap/:userId` - Activity heatmap
+- `GET /api/analytics/language-stats/:userId` - Language statistics
+- `GET /api/analytics/difficulty-stats/:userId` - Difficulty distribution
+
+#### Test Execution
+- `POST /api/test-execution/run` - Execute code tests
 
 ---
 
-## 🧪 Testing
+## 📜 Scripts
 
-### Ejecutar Todos los Tests
+### Backend Scripts
 ```bash
-npm run test
+npm run dev          # Start development server with nodemon
+npm run build        # Compile TypeScript
+npm start            # Start production server
+npm test             # Run tests with Vitest
+npm run seed         # Seed database with sample exercises
+npm run type-check   # Check TypeScript types
 ```
 
-### Tests en Modo Watch
+### Frontend Scripts
 ```bash
-npm run test:watch
-```
-
-### Ver Cobertura de Código
-```bash
-npm run test:coverage
-```
-
-### Ejecutar Tests Específicos
-```bash
-# Tests unitarios
-npm run test src/tests/unit/
-
-# Tests de integración
-npm run test src/tests/integration/
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run type-check   # Check TypeScript types
+npm run lint         # Lint code with ESLint
 ```
 
 ---
 
-## 🔒 Seguridad
+## 🎓 Usage Guide
 
-### Rate Limiting
-La API implementa rate limiting en múltiples niveles:
+### For Students
 
-| Endpoint | Límite | Ventana | Descripción |
-|----------|--------|---------|-------------|
-| General | 100 req | 15 min | Todas las rutas |
-| Login | 5 req | 15 min | Prevenir fuerza bruta |
-| Registro | 3 req | 1 hora | Prevenir spam |
-| IA (Gemini) | 10 req | 15 min | Proteger recursos de IA |
+1. **Register/Login**: Create an account or sign in
+2. **Browse Exercises**: Explore 30+ exercises by category
+3. **Start Workspace**: Click "Start Working" on any exercise
+4. **Code & Learn**: Write code with AI assistance
+5. **Run Tests**: Execute tests to validate your solution
+6. **Track Progress**: View your analytics and achievements
 
-### Logging Seguro
-Todos los logs sanitizan automáticamente información sensible:
+### For Instructors
 
-```typescript
-// ❌ NUNCA se loguea:
-- Passwords
-- Tokens JWT
-- API Keys
-- Authorization headers
-
-// ✅ Se redactan automáticamente:
-{
-  email: "user@example.com",
-  password: "***REDACTED***",
-  token: "***REDACTED***"
-}
-```
-
-### Headers de Seguridad (Helmet)
-- `Content-Security-Policy`
-- `X-Frame-Options`
-- `X-Content-Type-Options`
-- `Strict-Transport-Security`
-- `X-DNS-Prefetch-Control`
+1. **Create Exercises**: Use the "Create Exercise" page
+2. **Add Test Cases**: Define input/output test cases
+3. **Set Difficulty**: Easy, Medium, or Hard
+4. **Add Hints**: Progressive hints for students
+5. **Provide Solution**: Reference implementation
 
 ---
 
-## 📊 Comandos Útiles
+## 🤝 Contributing
 
-### Desarrollo
-```bash
-npm run dev              # Iniciar servidor en modo desarrollo
-npm run build            # Compilar TypeScript a JavaScript
-npm run start            # Iniciar servidor en producción
-npm run type-check       # Verificar tipos sin compilar
-```
+Contributions are welcome! Please follow these steps:
 
-### Testing
-```bash
-npm run test             # Ejecutar tests
-npm run test:watch       # Tests en watch mode
-npm run test:ui          # Abrir UI de Vitest
-npm run test:coverage    # Ver cobertura de código
-```
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-### Docker
-```bash
-docker-compose up -d     # Iniciar MongoDB
-docker-compose down      # Detener servicios
-docker-compose logs -f   # Ver logs de MongoDB
-docker ps                # Ver contenedores corriendo
-```
+### Development Guidelines
+
+- Follow the existing code style
+- Write meaningful commit messages
+- Add tests for new features
+- Update documentation as needed
 
 ---
 
-## 📈 Estado del Proyecto
+## 🐛 Known Issues
 
-### ✅ Completado
-
-- ✅ **Backend Core** (TypeScript + Express)
-- ✅ **MongoDB + Mongoose** (Models, Schemas, Validation)
-- ✅ **API REST Completa** (Auth + Exercises + AI)
-- ✅ **Autenticación JWT** (Register, Login, Me)
-- ✅ **Logging Profesional** (Winston + Sanitization)
-- ✅ **Rate Limiting** (General + Auth + IA)
-- ✅ **Security Headers** (Helmet + CORS)
-- ✅ **Integración IA** (Gemini 2.0 - Generate, Analyze, Explain)
-- ✅ **Swagger UI** (Documentación interactiva)
-- ✅ **Testing Setup** (Vitest + Coverage)
-- ✅ **Docker** (MongoDB containerizado)
-- ✅ **Error Handling** (Middleware centralizado)
-- ✅ **Input Validation** (Sanitización y validación)
-
-### ⏳ En Desarrollo
-
-- ⏳ **Frontend React** (TypeScript + Vite + shadcn/ui)
-- ⏳ **Deploy a Producción** (Railway/Render/AWS)
-- ⏳ **CI/CD** (GitHub Actions)
-- ⏳ **Tests E2E** (Playwright/Cypress)
-
-### 📊 Estadísticas
-
-- **Endpoints**: 12 completamente documentados
-- **Swagger UI**: http://localhost:5000/api-docs
-- **Tests**: Vitest configurado con coverage
-- **Líneas de código**: ~3000+
-- **Arquitectura**: Clean Architecture + TDD
-- **Commits**: Conventional commits
+- Integration tests need updating (auth changes)
+- E2E tests setup pending
+- Some exercises may need additional test cases
 
 ---
 
-## 🤝 Contribuir
+## 🔮 Roadmap
 
-### Proceso de Contribución
-
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'feat: add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
-
-### Guías de Contribución
-
-- **Seguir TDD**: Escribir tests antes del código
-- **Mantener cobertura**: >80% de coverage
-- **TypeScript estricto**: Sin `any`, tipado completo
-- **Commits descriptivos**: Usar [Conventional Commits](https://www.conventionalcommits.org/)
-- **Documentación**: JSDoc + Swagger para nuevos endpoints
-- **Seguridad**: Input validation + sanitización
+- [ ] Mobile responsive optimization
+- [ ] Social features (solution sharing, comments)
+- [ ] More programming languages
+- [ ] Live coding sessions
+- [ ] Leaderboards and competitions
+- [ ] Custom user themes
+- [ ] Code collaboration features
 
 ---
 
-## 📝 Licencia
+## 📝 License
 
-Este proyecto está bajo la Licencia MIT. Ver archivo `LICENSE` para más detalles.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 👥 Autor
+## 👤 Author
 
 **Bitxogm**
+
 - GitHub: [@Bitxogm](https://github.com/Bitxogm)
-- Proyecto: [New-Logic-Agent](https://github.com/Bitxogm/New-Logic-Agent)
+- Repository: [New-Logic-Agent](https://github.com/Bitxogm/New-Logic-Agent)
 
 ---
 
-## 🙏 Agradecimientos
+## 🙏 Acknowledgments
 
-- [Anthropic Claude](https://www.anthropic.com/) - Asistencia en desarrollo
-- [Google Gemini](https://deepmind.google/technologies/gemini/) - API de IA
-- [Express.js](https://expressjs.com/) - Framework web
-- [MongoDB](https://www.mongodb.com/) - Base de datos
-- [TypeScript](https://www.typescriptlang.org/) - Lenguaje
-- Comunidad Open Source
-
----
-
-## 📚 Recursos
-
-- [Documentación completa en `/docs`](./docs)
-- [Swagger UI](http://localhost:5000/api-docs) - Documentación interactiva
-- [Issues](https://github.com/Bitxogm/New-Logic-Agent/issues) - Reportar bugs
-- [Pull Requests](https://github.com/Bitxogm/New-Logic-Agent/pulls) - Contribuciones
+- [Google Gemini](https://ai.google.dev/) for the amazing AI capabilities
+- [shadcn/ui](https://ui.shadcn.com/) for beautiful UI components
+- [Monaco Editor](https://microsoft.github.io/monaco-editor/) for the VS Code experience
+- [Recharts](https://recharts.org/) for data visualization
+- All contributors and users of this project
 
 ---
 
-### ❓ ¿Preguntas?
+## 📸 Screenshots
 
-Abre un [issue](https://github.com/Bitxogm/New-Logic-Agent/issues) en GitHub o contacta al equipo.
+### Workspace
+![Workspace](docs/screenshots/workspace.png)
+*Interactive coding workspace with AI assistant*
+
+### Dashboard
+![Dashboard](docs/screenshots/dashboard.png)
+*Track your progress and achievements*
+
+### Analytics
+![Analytics](docs/screenshots/analytics.png)
+*Detailed performance analytics*
 
 ---
 
-🚀 **¡Happy Coding!**
+## 💡 Tips & Tricks
+
+### For Best Learning Experience
+
+1. **Start with Easy**: Build confidence with easy exercises first
+2. **Use Hints Wisely**: Try solving without hints for maximum XP
+3. **Experiment**: The AI assistant can explain alternative approaches
+4. **Track Progress**: Check analytics to identify areas for improvement
+5. **Maintain Streak**: Code daily to build consistency
+
+### Performance Tips
+
+- Use code templates for faster development
+- Check the flowchart tab to understand the algorithm
+- Run tests frequently to catch errors early
+- Save snapshots of your work regularly
+
+---
+
+**⭐ If you find this project useful, please consider giving it a star on GitHub! ⭐**
+
+Made with ❤️ and lots of ☕
+
