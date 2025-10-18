@@ -3,7 +3,7 @@ import {Exercise} from '../models/Exercise';
 
 const router = Router();
 
-router.post('/seed', async (_req: Request, res: Response) => {
+router.get('/seed', async (_req: Request, res: Response) => {
   try {
     const count = await Exercise.countDocuments();
     if (count > 0) {
@@ -501,7 +501,7 @@ router.post('/seed', async (_req: Request, res: Response) => {
 });
 
 // Force seed (elimina y recrea)
-router.post('/seed/force', async (_req: Request, res: Response) => {
+router.get('/seed/force', async (_req: Request, res: Response) => {
   try {
     await Exercise.deleteMany({});
     // Aquí se repetiría el array de ejercicios...
