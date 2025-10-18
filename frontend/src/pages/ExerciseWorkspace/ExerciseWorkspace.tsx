@@ -19,6 +19,7 @@ import FlowchartTab from './components/AIAssistantPanel/FlowchartTab';
 import TestsTab from './components/AIAssistantPanel/TestsTab';
 import HintsPanel from './components/AIAssistantPanel/HintsPanel';
 import ChatTab from './components/AIAssistantPanel/ChatTab';
+import { TemplateSelector } from '@/components/workspace/TemplateSelector';
 import { toast } from 'sonner';
 
 export default function ExerciseWorkspace() {
@@ -89,6 +90,14 @@ export default function ExerciseWorkspace() {
     setCode(newCode);
     setHasUnsavedChanges(true);
   }, []);
+
+  // Handle template insertion
+  const handleInsertTemplate = (templateCode: string) => {
+    // Insert template at the end of current code
+    const newCode = code.trim() ? `${code}\n\n${templateCode}` : templateCode;
+    setCode(newCode);
+    setHasUnsavedChanges(true);
+  };
 
   // Handle running tests
   const handleRunTests = async () => {
@@ -290,8 +299,8 @@ export default function ExerciseWorkspace() {
                       key={tab}
                       onClick={() => setActiveTab(tab as any)}
                       className={`px-4 py-2 text-sm font-medium capitalize transition-colors ${activeTab === tab
-                          ? 'text-primary border-b-2 border-primary'
-                          : 'text-muted-foreground hover:text-foreground'
+                        ? 'text-primary border-b-2 border-primary'
+                        : 'text-muted-foreground hover:text-foreground'
                         }`}
                     >
                       {tab}
@@ -338,6 +347,10 @@ export default function ExerciseWorkspace() {
             <Button variant="outline" size="sm" onClick={handleResetCode}>
               Reset Code
             </Button>
+            <TemplateSelector
+              language={exercise.language}
+              onSelectTemplate={handleInsertTemplate}
+            />
           </div>
 
           <div className="flex gap-2">
