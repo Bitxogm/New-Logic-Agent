@@ -222,4 +222,22 @@ exerciseSchema.statics.findWithFilters = async function(filters: {
 /**
  * Modelo de Exercise
  */
-export const Exercise: Model<IExercise> = mongoose.model<IExercise>('Exercise', exerciseSchema);
+
+// Singleton para evitar recompilación en tsx
+let cachedModel: Model<IExercise> | null = null;
+
+export const getExerciseModel = (): Model<IExercise> => {
+  if (cachedModel) return cachedModel;
+  
+  if (mongoose.models.Exercise) {
+    cachedModel = mongoose.models.Exercise as Model<IExercise>;
+    return cachedModel;
+  }
+  
+  cachedModel = mongoose.model<IExercise>('Exercise', exerciseSchema);
+  return cachedModel;
+};
+
+// Export por defecto y named para compatibilidad
+export const Exercise = getExerciseModel();
+export default Exercise;
