@@ -17,6 +17,7 @@ const isTestEnvironment = process.env.NODE_ENV === 'test';
 export const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
+  validate: {trustProxy: false},
   skip: () => isTestEnvironment, // ✅ AÑADIR: Skip en tests
   message: {
     success: false,
