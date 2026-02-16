@@ -1,23 +1,27 @@
-import express, { Express } from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import swaggerUi from 'swagger-ui-express';
-import { swaggerSpec } from './config/swagger.config';
-import { connectDatabase } from './config/database';
-import exerciseRoutes from './routes/exercises';
-import { errorHandler, notFoundHandler } from './middleware/errorHandler';
-import authRoutes from './routes/auth';
-import { httpLogger, errorLogger, logServerStart, logDatabaseConnection } from './middleware/logger.middleware';
-import logger from './config/logger.config';
-import { generalLimiter } from './middleware/rateLimiter';
-import { applySecurity } from './middleware/security';
-import { validateEnv } from './config/env.config';
-import aiRoutes from './routes/ai';
-import testExecutionRoutes from './routes/testExecution';
-import gamificationRoutes from './routes/gamification';
-import analyticsRoutes from './routes/analytics';
-import seedRoutes from './routes/seed';
-
+import express, { Express } from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./config/swagger.config";
+import { connectDatabase } from "./config/database";
+import exerciseRoutes from "./routes/exercises";
+import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
+import authRoutes from "./routes/auth";
+import {
+  httpLogger,
+  errorLogger,
+  logServerStart,
+  logDatabaseConnection,
+} from "./middleware/logger.middleware";
+import logger from "./config/logger.config";
+import { generalLimiter } from "./middleware/rateLimiter";
+import { applySecurity } from "./middleware/security";
+import { validateEnv } from "./config/env.config";
+import aiRoutes from "./routes/ai";
+import testExecutionRoutes from "./routes/testExecution";
+import gamificationRoutes from "./routes/gamification";
+import analyticsRoutes from "./routes/analytics";
+import seedRoutes from "./routes/seed";
 
 // Cargar variables de entorno
 dotenv.config();
@@ -26,7 +30,7 @@ dotenv.config();
 try {
   validateEnv();
 } catch (error) {
-  console.error('Error en variables de entorno:', error);
+  console.error("Error en variables de entorno:", error);
   process.exit(1);
 }
 
@@ -35,6 +39,7 @@ try {
  */
 function createApp(): Express {
   const app = express();
+  app.set("trust proxy", true);
 
   // ✅ AÑADIR: Seguridad (primero de todo)
   applySecurity(app);
@@ -46,23 +51,29 @@ function createApp(): Express {
   app.use(generalLimiter);
 
   // CORS
-  app.use(cors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
-    credentials: true
-  }));
+  app.use(
+    cors({
+      origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+      credentials: true,
+    }),
+  );
 
   // Parsing
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   // ✅ AÑADIR: Swagger UI
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-    customCss: '.swagger-ui .topbar { display: none }',
-    customSiteTitle: 'AgentLogic API Docs',
-  }));
+  app.use(
+    "/api-docs",
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerSpec, {
+      customCss: ".swagger-ui .topbar { display: none }",
+      customSiteTitle: "AgentLogic API Docs",
+    }),
+  );
 
   // ✅ AÑADIR: Endpoint para spec JSON
-  app.get('/api-docs.json', (_req, res) => {
-    res.setHeader('Content-Type', 'application/json');
+  app.get("/api-docs.json", (_req, res) => {
+    res.setHeader("Content-Type", "application/json");
     res.send(swaggerSpec);
   });
 
@@ -92,23 +103,23 @@ function createApp(): Express {
    */
 
   // Ruta de health check
-  app.get('/health', (_req, res) => {
-    logger.info('Health check solicitado');
+  app.get("/health", (_req, res) => {
+    logger.info("Health check solicitado");
     res.json({
       success: true,
-      message: 'API funcionando correctamente',
-      timestamp: new Date().toISOString()
+      message: "API funcionando correctamente",
+      timestamp: new Date().toISOString(),
     });
   });
 
   // Rutas principales
-  app.use('/api/exercises', exerciseRoutes);
-  app.use('/api/auth', authRoutes);
-  app.use('/api/ai', aiRoutes);
-  app.use('/api/test-execution', testExecutionRoutes);
-  app.use('/api/gamification', gamificationRoutes);
-  app.use('/api/analytics', analyticsRoutes);
-  app.use('/api', seedRoutes);
+  app.use("/api/exercises", exerciseRoutes);
+  app.use("/api/auth", authRoutes);
+  app.use("/api/ai", aiRoutes);
+  app.use("/api/test-execution", testExecutionRoutes);
+  app.use("/api/gamification", gamificationRoutes);
+  app.use("/api/analytics", analyticsRoutes);
+  app.use("/api", seedRoutes);
 
   // Manejo de errores
   app.use(notFoundHandler);
@@ -135,24 +146,24 @@ async function startServer(): Promise<void> {
     });
   } catch (error) {
     logDatabaseConnection(false, error as Error);
-    logger.error('❌ Error iniciando servidor:', error);
+    logger.error("❌ Error iniciando servidor:", error);
     process.exit(1);
   }
 }
 
 // Manejo de señales de terminación
-process.on('SIGTERM', () => {
-  logger.warn('⚠️ SIGTERM recibido, cerrando servidor...');
+process.on("SIGTERM", () => {
+  logger.warn("⚠️ SIGTERM recibido, cerrando servidor...");
   process.exit(0);
 });
 
-process.on('SIGINT', () => {
-  logger.warn('⚠️ SIGINT recibido, cerrando servidor...');
+process.on("SIGINT", () => {
+  logger.warn("⚠️ SIGINT recibido, cerrando servidor...");
   process.exit(0);
 });
 
 // Iniciar solo si no estamos en modo test
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== "test") {
   startServer();
 }
 
