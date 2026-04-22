@@ -21,8 +21,10 @@ interface EnvConfig {
 const requiredEnvVars = [
   'MONGODB_URI',
   'JWT_SECRET',
-  'GEMINI_API_KEY'
+  'GEMINI_API_KEY',
+  ...(process.env.NODE_ENV === 'production' ? ['CORS_ORIGIN'] : [])
 ] as const;
+
 
 /**
  * Variables de entorno opcionales con valores por defecto

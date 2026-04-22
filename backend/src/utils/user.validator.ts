@@ -32,6 +32,8 @@ export class UserValidator {
 
     const trimmed = username.trim();
 
+
+
     if (trimmed.length < 3) {
       return { isValid: false, error: 'El username debe tener al menos 3 caracteres' };
     }
@@ -82,9 +84,13 @@ export class UserValidator {
     return { isValid: true, sanitized: trimmed };
   }
 
-/**
-   * Valida password según política de seguridad SIMPLIFICADA:
+  /**
+   * Valida password según política de seguridad:
    * - Mínimo 8 caracteres
+   * - Al menos una mayúscula
+   * - Al menos una minúscula
+   * - Al menos un número
+   * - Al menos un carácter especial
    * 
    * @param password - Password a validar
    * @returns Resultado de validación
@@ -102,5 +108,23 @@ export class UserValidator {
       return { isValid: false, error: 'El password es demasiado largo (máximo 128 caracteres)' };
     }
 
+    // Complejidad
+    if (!/[A-Z]/.test(password)) {
+      return { isValid: false, error: 'El password debe contener al menos una mayúscula' };
+    }
+
+    if (!/[a-z]/.test(password)) {
+      return { isValid: false, error: 'El password debe contener al menos una minúscula' };
+    }
+
+    if (!/[0-9]/.test(password)) {
+      return { isValid: false, error: 'El password debe contener al menos un número' };
+    }
+
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      return { isValid: false, error: 'El password debe contener al menos un carácter especial' };
+    }
+
     return { isValid: true };
-  }};
+  }
+}

@@ -292,24 +292,30 @@ router.post(
 
 router.post(
   '/analyze-exercise',
+  authenticate,
   aiController.analyzeExercise.bind(aiController)
 );
 
+
 router.post(
   '/generate-flowchart',
+  authenticate,
   aiController.generateFlowchart.bind(aiController));
 
-router.post('/chat',
+
+router.post(
+  '/chat',
+  authenticate,
   aiController.sendChatMessage.bind(aiController));
 
-router.post('/chat',
-  aiController.sendChatMessage.bind(aiController));
 
 // ⬇️ AÑADIR ESTAS LÍNEAS AQUÍ ⬇️
 router.post(
   '/analyze-progress',
+  authenticate,
   analysisLimiter,
   aiController.analyzeProgress.bind(aiController)
 );
+
 
 export default router;

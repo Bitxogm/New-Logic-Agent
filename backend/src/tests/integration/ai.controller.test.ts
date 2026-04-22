@@ -2,6 +2,11 @@
  * Tests de Integración para AI Controller
  */
 
+process.env.NODE_ENV = 'test';
+process.env.MONGODB_URI = 'mongodb://localhost:27018/agentlogic-test';
+process.env.JWT_SECRET = 'test-secret-key-12345';
+
+
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import request from 'supertest';
 import { createApp } from '../../index';

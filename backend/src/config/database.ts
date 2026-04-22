@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import logger from './logger.config';
+
 
 /**
  * Conecta a la base de datos MongoDB
@@ -8,7 +10,7 @@ import mongoose from 'mongoose';
  * 
  * @example
  * await connectDatabase();
- * console.log('Conectado a MongoDB');
+ * logger.info('Conectado a MongoDB');
  */
 export async function connectDatabase(): Promise<void> {
   try {
@@ -16,19 +18,19 @@ export async function connectDatabase(): Promise<void> {
     
     await mongoose.connect(mongoUri);
     
-    console.log('✅ Conectado a MongoDB');
+    logger.info('✅ Conectado a MongoDB');
     
     // Log de eventos de conexión
     mongoose.connection.on('error', (error) => {
-      console.error('❌ Error de MongoDB:', error);
+      logger.error('❌ Error de MongoDB:', error);
     });
 
     mongoose.connection.on('disconnected', () => {
-      console.warn('⚠️ MongoDB desconectado');
+      logger.warn('⚠️ MongoDB desconectado');
     });
 
   } catch (error) {
-    console.error('❌ Error conectando a MongoDB:', error);
+    logger.error('❌ Error conectando a MongoDB:', error);
     // En producción, deberías usar un logger profesional
     process.exit(1);
   }
@@ -41,9 +43,9 @@ export async function connectDatabase(): Promise<void> {
 export async function disconnectDatabase(): Promise<void> {
   try {
     await mongoose.disconnect();
-    console.log('MongoDB desconectado correctamente');
+    logger.info('MongoDB desconectado correctamente');
   } catch (error) {
-    console.error('Error desconectando MongoDB:', error);
+    logger.error('Error desconectando MongoDB:', error);
   }
 }
 

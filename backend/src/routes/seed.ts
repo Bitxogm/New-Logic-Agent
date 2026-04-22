@@ -4,6 +4,13 @@ import {Exercise} from '../models/Exercise';
 const router = Router();
 
 router.get('/seed', async (_req: Request, res: Response) => {
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(403).json({
+      success: false,
+      error: 'Seed no permitido en producción'
+    });
+  }
+
   try {
     const count = await Exercise.countDocuments();
     if (count > 0) {
@@ -500,14 +507,20 @@ router.get('/seed', async (_req: Request, res: Response) => {
   }
 });
 
-// Force seed (elimina y recrea)
+// Force seed (elimina y redirige al seed normal para reinsertar)
 router.get('/seed/force', async (_req: Request, res: Response) => {
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(403).json({
+      success: false,
+      error: 'Seed no permitido en producción'
+    });
+  }
+
   try {
     await Exercise.deleteMany({});
-    // Aquí se repetiría el array de ejercicios...
-    res.json({ success: true, message: 'Base de datos reiniciada y poblada' });
+    return res.redirect('/api/seed');
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    return res.status(500).json({ success: false, error: error.message });
   }
 });
 

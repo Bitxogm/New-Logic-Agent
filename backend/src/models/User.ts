@@ -102,4 +102,20 @@ userSchema.methods.toJSON = function() {
 /**
  * Modelo de User
  */
-export const User: Model<IUserDocument> = mongoose.model<IUserDocument>('User', userSchema);
+// Singleton para evitar recompilación en tests/hot-reload
+let cachedModel: Model<IUserDocument> | null = null;
+
+export const getUserModel = (): Model<IUserDocument> => {
+  if (cachedModel) return cachedModel;
+  
+  if (mongoose.models.User) {
+    cachedModel = mongoose.models.User as Model<IUserDocument>;
+    return cachedModel;
+  }
+  
+  cachedModel = mongoose.model<IUserDocument>('User', userSchema);
+  return cachedModel;
+};
+
+export const User = getUserModel();
+export default User;

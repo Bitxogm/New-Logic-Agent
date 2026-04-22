@@ -1,3 +1,8 @@
+// Configurar para tests
+process.env.NODE_ENV = 'test';
+process.env.MONGODB_URI = 'mongodb://localhost:27018/agentlogic-test';
+process.env.JWT_SECRET = 'test-secret-key-12345';
+
 import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
 import request from 'supertest';
 import express, { Express } from 'express';
@@ -6,14 +11,14 @@ import authRoutes from '../../routes/auth';
 import { errorHandler } from '../../middleware/errorHandler';
 import { User } from '../../models/User';
 
+
 describe('Auth Controller (Integration)', () => {
   let app: Express;
 
   beforeAll(async () => {
-    // Conectar a MongoDB
-    if (mongoose.connection.readyState === 0) {
-      await mongoose.connect('mongodb://localhost:27018/agentlogic-test');
-    }
+    // Conectar a MongoDB usando la config centralizada
+    await (await import('../../config/database')).connectDatabase();
+
 
     // Crear app de Express
     app = express();
@@ -32,8 +37,10 @@ describe('Auth Controller (Integration)', () => {
       const userData = {
         username: 'testuser',
         email: 'test@example.com',
-        password: 'Test1234!'
+        password: 'Test1234!',
+        name: 'Test User'
       };
+
 
       const response = await request(app)
         .post('/api/auth/register')
@@ -52,8 +59,10 @@ describe('Auth Controller (Integration)', () => {
       const userData = {
         username: 'user1',
         email: 'duplicate@example.com',
-        password: 'Test1234!'
+        password: 'Test1234!',
+        name: 'User One'
       };
+
 
       // Crear primer usuario
       await request(app)
@@ -66,8 +75,10 @@ describe('Auth Controller (Integration)', () => {
         .send({
           username: 'user2',
           email: 'duplicate@example.com',
-          password: 'Test1234!'
+          password: 'Test1234!',
+          name: 'User Two'
         })
+
         .expect(400);
 
       expect(response.body.success).toBe(false);
@@ -78,8 +89,10 @@ describe('Auth Controller (Integration)', () => {
       const userData = {
         username: 'testuser',
         email: 'test@example.com',
-        password: 'weak'
+        password: 'weak',
+        name: 'Weak Password User'
       };
+
 
       const response = await request(app)
         .post('/api/auth/register')
@@ -94,8 +107,10 @@ describe('Auth Controller (Integration)', () => {
       const userData = {
         username: 'testuser',
         email: 'invalid-email',
-        password: 'Test1234!'
+        password: 'Test1234!',
+        name: 'Invalid Email User'
       };
+
 
       const response = await request(app)
         .post('/api/auth/register')
@@ -115,8 +130,10 @@ describe('Auth Controller (Integration)', () => {
         .send({
           username: 'loginuser',
           email: 'login@example.com',
-          password: 'Test1234!'
+          password: 'Test1234!',
+          name: 'Login User'
         });
+
     });
 
     it('debe hacer login con credenciales válidas', async () => {
@@ -175,29 +192,31 @@ describe('Auth Controller (Integration)', () => {
   describe('GET /api/auth/me', () => {
     let authToken: string;
 
-    beforeEach(async () => {
+
+
+    it('debe obtener datos del usuario autenticado', async () => {
       // Registrar y obtener token
-      const response = await request(app)
+      const registerResponse = await request(app)
         .post('/api/auth/register')
         .send({
           username: 'meuser',
           email: 'me@example.com',
-          password: 'Test1234!'
+          password: 'Test1234!',
+          name: 'Me User'
         });
 
-      authToken = response.body.data.token;
-    });
+      const token = registerResponse.body.data.token;
 
-    it('debe obtener datos del usuario autenticado', async () => {
       const response = await request(app)
         .get('/api/auth/me')
-        .set('Authorization', `Bearer ${authToken}`)
+        .set('Authorization', `Bearer ${token}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
       expect(response.body.data.email).toBe('me@example.com');
       expect(response.body.data.username).toBe('meuser');
     });
+
 
     it('debe rechazar sin token', async () => {
       const response = await request(app)
@@ -216,5 +235,6 @@ describe('Auth Controller (Integration)', () => {
 
       expect(response.body.success).toBe(false);
     });
+
   });
 });

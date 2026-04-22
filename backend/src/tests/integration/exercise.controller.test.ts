@@ -1,3 +1,8 @@
+// Configurar para tests
+process.env.NODE_ENV = 'test';
+process.env.MONGODB_URI = 'mongodb://localhost:27018/agentlogic-test';
+process.env.JWT_SECRET = 'test-secret-key-12345';
+
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import request from 'supertest';
 import express, { Express } from 'express';
@@ -6,25 +11,45 @@ import exerciseRoutes from '../../routes/exercises';
 import { errorHandler } from '../../middleware/errorHandler';
 
 describe('Exercise Controller (Integration)', () => {
+
   let app: Express;
+  let authToken: string;
 
   beforeAll(async () => {
-    // Configurar para tests
-    process.env.NODE_ENV = 'test';
-    process.env.MONGODB_URI = 'mongodb://localhost:27018/agentlogic-test';
-    
     await connectDatabase();
+
 
     // Crear app de Express para testing
     app = express();
     app.use(express.json());
     app.use('/api/exercises', exerciseRoutes);
+    
+    // Necesitamos authRoutes para el login en tests
+    const authRoutes = (await import('../../routes/auth')).default;
+    app.use('/api/auth', authRoutes);
+    
     app.use(errorHandler);
   });
 
+
+
+
   beforeEach(async () => {
     await clearDatabase();
+
+    // Registrar un usuario para obtener el token en cada test
+    const registerResponse = await request(app)
+      .post('/api/auth/register')
+      .send({
+        username: 'exercisetester',
+        email: 'tester@example.com',
+        password: 'Test1234!',
+        name: 'Exercise Tester'
+      });
+    
+    authToken = registerResponse.body.data.token;
   });
+
 
   afterAll(async () => {
     await disconnectDatabase();
@@ -37,13 +62,17 @@ describe('Exercise Controller (Integration)', () => {
         description: 'Escribe una función que sume dos números enteros',
         language: 'python',
         difficulty: 'easy',
+        category: 'logic-math',
         tags: ['matemáticas', 'básico']
       };
 
+
       const response = await request(app)
         .post('/api/exercises')
+        .set('Authorization', `Bearer ${authToken}`)
         .send(exerciseData)
         .expect(201);
+
 
       expect(response.body.success).toBe(true);
       expect(response.body.data).toHaveProperty('_id');
@@ -53,18 +82,40 @@ describe('Exercise Controller (Integration)', () => {
 
     it('debe rechazar ejercicio sin título', async () => {
       const exerciseData = {
-        description: 'Descripción válida',
+        description: 'Escribe una función que sume dos números enteros',
         language: 'python',
-        difficulty: 'easy'
+        difficulty: 'easy',
+        category: 'logic-math',
+        tags: ['matemáticas', 'básico']
       };
 
       const response = await request(app)
         .post('/api/exercises')
+        .set('Authorization', `Bearer ${authToken}`)
         .send(exerciseData)
         .expect(400);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.error).toBeDefined();
+      expect(response.body.error).toContain('título');
+    });
+
+    it('debe rechazar ejercicio sin categoría', async () => {
+      const exerciseData = {
+        title: 'Suma de números',
+        description: 'Escribe una función que sume dos números enteros',
+        language: 'python',
+        difficulty: 'easy',
+        tags: ['matemáticas', 'básico']
+      };
+
+      const response = await request(app)
+        .post('/api/exercises')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send(exerciseData)
+        .expect(400);
+
+      expect(response.body.success).toBe(false);
+      expect(response.body.error).toContain('categoría');
     });
 
     it('debe rechazar título con HTML malicioso', async () => {
@@ -72,13 +123,17 @@ describe('Exercise Controller (Integration)', () => {
         title: '<script>alert("xss")</script>',
         description: 'Descripción válida con suficientes caracteres',
         language: 'python',
+        category: 'logic-math',
+        tags: ['test'],
         difficulty: 'easy'
       };
 
       const response = await request(app)
         .post('/api/exercises')
+        .set('Authorization', `Bearer ${authToken}`)
         .send(exerciseData)
         .expect(400);
+
 
       expect(response.body.success).toBe(false);
       expect(response.body.error).toContain('caracteres no permitidos');
@@ -90,26 +145,36 @@ describe('Exercise Controller (Integration)', () => {
       // Crear ejercicios de prueba
       await request(app)
         .post('/api/exercises')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           title: 'Ejercicio 1',
           description: 'Descripción del ejercicio 1',
           language: 'python',
-          difficulty: 'easy'
+          difficulty: 'easy',
+          category: 'logic-math',
+          tags: ['test']
         });
+
+
 
       await request(app)
         .post('/api/exercises')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           title: 'Ejercicio 2',
           description: 'Descripción del ejercicio 2',
           language: 'javascript',
-          difficulty: 'medium'
+          difficulty: 'medium',
+          category: 'logic-math',
+          tags: ['test']
         });
+
+
     });
 
     it('debe listar todos los ejercicios', async () => {
       const response = await request(app)
-        .get('/api/exercises')
+        .get('/api/exercises').set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
@@ -118,9 +183,19 @@ describe('Exercise Controller (Integration)', () => {
       expect(response.body.pagination).toBeDefined();
     });
 
+    it('debe obtener la lista de ejercicios con búsqueda por texto', async () => {
+      const response = await request(app)
+        .get('/api/exercises?search=Suma')
+        .set('Authorization', `Bearer ${authToken}`)
+        .expect(200);
+
+      expect(response.body.success).toBe(true);
+      expect(Array.isArray(response.body.data)).toBe(true);
+    });
+
     it('debe filtrar por dificultad', async () => {
       const response = await request(app)
-        .get('/api/exercises?difficulty=easy')
+        .get('/api/exercises?difficulty=easy').set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
       expect(response.body.data.length).toBe(1);
@@ -129,7 +204,7 @@ describe('Exercise Controller (Integration)', () => {
 
     it('debe paginar resultados', async () => {
       const response = await request(app)
-        .get('/api/exercises?page=1&limit=1')
+        .get('/api/exercises?page=1&limit=1').set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
       expect(response.body.data.length).toBe(1);
@@ -144,18 +219,23 @@ describe('Exercise Controller (Integration)', () => {
       // Crear ejercicio
       const createResponse = await request(app)
         .post('/api/exercises')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           title: 'Test Exercise',
           description: 'Descripción de prueba para obtener por ID',
           language: 'python',
-          difficulty: 'easy'
+          difficulty: 'easy',
+          category: 'logic-math',
+          tags: ['test']
         });
+
+
 
       const id = createResponse.body.data._id;
 
       // Obtener ejercicio
       const response = await request(app)
-        .get(`/api/exercises/${id}`)
+        .get(`/api/exercises/${id}`).set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
@@ -167,7 +247,7 @@ describe('Exercise Controller (Integration)', () => {
       const fakeId = '507f1f77bcf86cd799439011';
 
       const response = await request(app)
-        .get(`/api/exercises/${fakeId}`)
+        .get(`/api/exercises/${fakeId}`).set('Authorization', `Bearer ${authToken}`)
         .expect(404);
 
       expect(response.body.success).toBe(false);
@@ -176,7 +256,7 @@ describe('Exercise Controller (Integration)', () => {
 
     it('debe rechazar ID inválido', async () => {
       const response = await request(app)
-        .get('/api/exercises/invalid-id')
+        .get('/api/exercises/invalid-id').set('Authorization', `Bearer ${authToken}`)
         .expect(400);
 
       expect(response.body.success).toBe(false);
@@ -188,18 +268,23 @@ describe('Exercise Controller (Integration)', () => {
       // Crear ejercicio
       const createResponse = await request(app)
         .post('/api/exercises')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           title: 'Original Title',
           description: 'Descripción original que tiene suficientes caracteres',
           language: 'python',
-          difficulty: 'easy'
+          difficulty: 'easy',
+          category: 'logic-math',
+          tags: ['test']
         });
+
+
 
       const id = createResponse.body.data._id;
 
       // Actualizar
       const response = await request(app)
-        .patch(`/api/exercises/${id}`)
+        .patch(`/api/exercises/${id}`).set('Authorization', `Bearer ${authToken}`)
         .send({ title: 'Updated Title' })
         .expect(200);
 
@@ -211,17 +296,22 @@ describe('Exercise Controller (Integration)', () => {
     it('debe rechazar actualización con datos inválidos', async () => {
       const createResponse = await request(app)
         .post('/api/exercises')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           title: 'Test',
           description: 'Descripción de prueba con suficientes caracteres',
           language: 'python',
-          difficulty: 'easy'
+          difficulty: 'easy',
+          category: 'logic-math',
+          tags: ['test']
         });
+
+
 
       const id = createResponse.body.data._id;
 
       const response = await request(app)
-        .patch(`/api/exercises/${id}`)
+        .patch(`/api/exercises/${id}`).set('Authorization', `Bearer ${authToken}`)
         .send({ difficulty: 'impossible' })
         .expect(400);
 
@@ -234,18 +324,23 @@ describe('Exercise Controller (Integration)', () => {
       // Crear ejercicio
       const createResponse = await request(app)
         .post('/api/exercises')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           title: 'To Delete',
           description: 'Este ejercicio será eliminado en la prueba',
           language: 'python',
-          difficulty: 'easy'
+          difficulty: 'easy',
+          category: 'logic-math',
+          tags: ['test']
         });
+
+
 
       const id = createResponse.body.data._id;
 
       // Eliminar
       const response = await request(app)
-        .delete(`/api/exercises/${id}`)
+        .delete(`/api/exercises/${id}`).set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
@@ -253,7 +348,7 @@ describe('Exercise Controller (Integration)', () => {
 
       // Verificar que ya no existe
       await request(app)
-        .get(`/api/exercises/${id}`)
+        .get(`/api/exercises/${id}`).set('Authorization', `Bearer ${authToken}`)
         .expect(404);
     });
   });

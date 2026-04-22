@@ -1,7 +1,8 @@
 // backend/src/controllers/testExecutionController.ts
 
 import { Request, Response } from 'express';
-import { VM } from 'vm2';
+// import { VM } from 'vm2'; // ELIMINADO POR SEGURIDAD
+
 import { spawn } from 'child_process';
 import logger from '../config/logger.config';
 
@@ -29,60 +30,23 @@ interface TestResult {
 /**
  * Execute JavaScript code in a sandboxed environment
  */
-const executeJavaScript = async (code: string, testCase: TestCase, functionName?: string): Promise<TestResult> => {
+/**
+ * Execute JavaScript code in a sandboxed environment
+ * @deprecated VM2 is disabled for security reasons
+ */
+const executeJavaScript = async (_code: string, testCase: TestCase, _functionName?: string): Promise<TestResult> => {
   const startTime = Date.now();
 
-  try {
-    const vm = new VM({
-      timeout: 5000, // 5 seconds timeout
-      sandbox: {},
-    });
-
-    // Prepare code execution
-    let fullCode = code;
-    
-    // If function name is provided, call it with test inputs
-    if (functionName) {
-      const inputArgs = testCase.input.map(arg => JSON.stringify(arg)).join(', ');
-      fullCode += `\n${functionName}(${inputArgs});`;
-    } else {
-      // Try to find function name from code
-      const funcMatch = code.match(/function\s+(\w+)/);
-      const arrowMatch = code.match(/const\s+(\w+)\s*=/);
-      const detectedName = funcMatch?.[1] || arrowMatch?.[1];
-      
-      if (detectedName) {
-        const inputArgs = testCase.input.map(arg => JSON.stringify(arg)).join(', ');
-        fullCode += `\n${detectedName}(${inputArgs});`;
-      }
-    }
-
-    const result = vm.run(fullCode);
-    const executionTime = Date.now() - startTime;
-
-    // Compare results
-    const passed = JSON.stringify(result) === JSON.stringify(testCase.expectedOutput);
-
-    return {
-      passed,
-      input: testCase.input,
-      expectedOutput: testCase.expectedOutput,
-      actualOutput: result,
-      error: null,
-      executionTime,
-    };
-  } catch (error: any) {
-    const executionTime = Date.now() - startTime;
-    return {
-      passed: false,
-      input: testCase.input,
-      expectedOutput: testCase.expectedOutput,
-      actualOutput: null,
-      error: error.message || 'Execution error',
-      executionTime,
-    };
-  }
+  return {
+    passed: false,
+    input: testCase.input,
+    expectedOutput: testCase.expectedOutput,
+    actualOutput: null,
+    error: 'La ejecución de JavaScript está temporalmente deshabilitada por motivos de seguridad (vulnerabilidad detectada en sandbox). Use Python por ahora.',
+    executionTime: Date.now() - startTime,
+  };
 };
+
 
 /**
  * Execute Python code using child process

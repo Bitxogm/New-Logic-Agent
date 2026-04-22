@@ -28,6 +28,14 @@ export const createExerciseSchema = z.object({
       message: 'La dificultad debe ser easy, medium o hard',
     }),
   
+  category: z
+    .string()
+    .min(1, 'Debes seleccionar una categoría')
+    .refine((val) => ['arrays', 'strings', 'loops', 'data-structures', 'algorithms', 'logic-math'].includes(val), {
+      message: 'Categoría no válida',
+    }),
+
+  
   language: z
     .string()
     .min(2, 'Debes seleccionar un lenguaje'),

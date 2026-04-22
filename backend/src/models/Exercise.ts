@@ -110,9 +110,18 @@ exerciseSchema.index({
   language: 1 
 });
 
+// Índice para texto (búsquedas por palabra clave)
+// language_override evita conflicto con el campo 'language' del ejercicio
+exerciseSchema.index({
+  title: 'text',
+  description: 'text',
+  keywords: 'text'
+}, { language_override: 'textLang' });
+
 // Índice para tags
 exerciseSchema.index({ 
   tags: 1 
+
 });
 
 // Índice para categoría

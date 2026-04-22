@@ -15,11 +15,12 @@ export const getHeatmapData = async (req: Request, res: Response) => {
     const progress = await UserProgress.findOne({ userId });
     
     if (!progress) {
-      return res.status(404).json({
-        success: false,
-        message: 'User progress not found',
+      return res.json({
+        success: true,
+        data: [],
       });
     }
+
     
     // Get last N days
     const daysAgo = parseInt(days as string);
@@ -60,11 +61,12 @@ export const getLanguageStats = async (req: Request, res: Response) => {
     const progress = await UserProgress.findOne({ userId });
     
     if (!progress) {
-      return res.status(404).json({
-        success: false,
-        message: 'User progress not found',
+      return res.json({
+        success: true,
+        data: [],
       });
     }
+
     
     // Aggregate stats by language
     const languageStats: Record<string, {
@@ -129,11 +131,16 @@ export const getDifficultyStats = async (req: Request, res: Response) => {
     const progress = await UserProgress.findOne({ userId });
     
     if (!progress) {
-      return res.status(404).json({
-        success: false,
-        message: 'User progress not found',
+      return res.json({
+        success: true,
+        data: [
+          { difficulty: 'easy', count: 0, totalXP: 0, totalTime: 0, avgTime: 0, percentage: 0 },
+          { difficulty: 'medium', count: 0, totalXP: 0, totalTime: 0, avgTime: 0, percentage: 0 },
+          { difficulty: 'hard', count: 0, totalXP: 0, totalTime: 0, avgTime: 0, percentage: 0 }
+        ],
       });
     }
+
     
     // Aggregate stats by difficulty
     const difficultyStats: Record<string, {

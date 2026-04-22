@@ -24,6 +24,7 @@ export default function CreateExercise() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [difficulty, setDifficulty] = useState('easy');
+  const [category, setCategory] = useState('algorithms');
   const [language, setLanguage] = useState('Python');
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
@@ -66,6 +67,7 @@ export default function CreateExercise() {
       title,
       description,
       difficulty,
+      category,
       language,
       tags,
       testCases: parsedTestCases,
@@ -158,7 +160,7 @@ export default function CreateExercise() {
               />
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>Dificultad *</Label>
                 <Select value={difficulty} onValueChange={setDifficulty}>
@@ -188,7 +190,25 @@ export default function CreateExercise() {
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="space-y-2">
+                <Label>Categoría *</Label>
+                <Select value={category} onValueChange={setCategory}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="arrays">Arrays</SelectItem>
+                    <SelectItem value="strings">Strings</SelectItem>
+                    <SelectItem value="loops">Bucles</SelectItem>
+                    <SelectItem value="data-structures">Estructuras de Datos</SelectItem>
+                    <SelectItem value="algorithms">Algoritmos</SelectItem>
+                    <SelectItem value="logic-math">Lógica Matemática</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+
 
             <div className="space-y-2">
               <Label>Etiquetas *</Label>

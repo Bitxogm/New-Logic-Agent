@@ -1,4 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
+import logger from '../config/logger.config';
+
 
 /**
  * Error personalizado de la aplicación
@@ -36,7 +38,13 @@ export function errorHandler(
   res: Response,
   _next: NextFunction
 ): void {
-  console.error('❌ Error capturado:', err);
+  logger.error('❌ Error capturado:', {
+    message: err.message,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+    path: _req.path,
+    method: _req.method,
+  });
+
 
   // Error operacional (controlado)
   if (err instanceof AppError) {
